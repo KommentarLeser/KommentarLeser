@@ -28,6 +28,8 @@ namespace BlogReader
 		{
 			InitializeComponent();
 			parser = new AngleSharp.Parser.Html.HtmlParser();
+			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/die-spaltung-der-linken-ganz-im-sinne-der-herrschenden/";
+			textBoxUrl.Text = @"http://vineyardsaker.de/analyse/der-gescheiterte-putsch-in-der-tuerkei-einige-erste-gedanken/";
 			//string htmlname = @"D:\temp\_________\BlogReader\html.htm";
 			// System.IO.TextReader reader = new System.IO.StreamReader(htmlname);
 			//html = System.IO.File.ReadAllText(htmlname);
@@ -59,13 +61,55 @@ namespace BlogReader
 
 		private void loadButton_Click(object sender, EventArgs e)
 		{
+			UseWaitCursor = true;
 			string htmlname = textBoxUrl.Text;
-			byte[] bytes = webClient.DownloadData(htmlname);
-			html = System.Text.Encoding.UTF8.GetString(bytes);
-			doc = parser.Parse(html);
-			var div = doc.QuerySelector(".social-comments");
-			list = div.QuerySelector(".social-commentlist");
-			var items = list.Children; // <li></li>
+			try
+			{
+				byte[] bytes = webClient.DownloadData(htmlname);
+				html = System.Text.Encoding.UTF8.GetString(bytes);
+				doc = parser.Parse(html);
+				var div = doc?.QuerySelector(".social-comments");
+				list = div?.QuerySelector(".social-commentlist");
+			}
+			catch(Exception ex)
+			{
+				return;
+			}
+			finally
+			{
+				if(list != null)
+				{
+					treeView1.Nodes.Clear();
+					expandButton.Text = "Alles auf";
+					expanded = false;
+					filltreeX(list, treeView1.Nodes);
+					
+				}
+				UseWaitCursor = false;
+			}
+			//if(expanded)
+			//	treeView1.ExpandAll();
+
+			//var items = list.Children; // <li></li>
+			//foreach(var item in items)
+			//{
+			//	entry ent = new entry();
+			//	ent.name = item.QuerySelector("cite.fn").TextContent;
+			//	ent.id = item.QuerySelector(".social-comment-inner").Id;
+			//	ent.when = item.QuerySelector(".social-posted-when").TextContent;
+			//	ent.text = item.QuerySelector(".social-comment-body").TextContent;
+			//	ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
+			//	TreeNode tn = new TreeNode(ent.name + "  -  " + ent.when);
+			//	tn.Tag = ent;
+			//	treeView1.Nodes.Add(tn);
+			//	var sublist = item.QuerySelector("ul"); // Unterliste?
+			//	if(sublist != null)
+			//		filltree(sublist, tn);
+			//}
+		}
+		private void filltreeX(AngleSharp.Dom.IElement subList, TreeNodeCollection nodelist)
+		{
+			var items = subList.Children;
 			foreach(var item in items)
 			{
 				entry ent = new entry();
@@ -76,46 +120,49 @@ namespace BlogReader
 				ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
 				TreeNode tn = new TreeNode(ent.name + "  -  " + ent.when);
 				tn.Tag = ent;
-				treeView1.Nodes.Add(tn);
+				if(seenSet.Contains(ent.id))
+					markTreeNode(tn);
+				nodelist.Add(tn);
 				var sublist = item.QuerySelector("ul"); // Unterliste?
 				if(sublist != null)
-					filltree(sublist, tn);
+					filltreeX(sublist, tn.Nodes);
 			}
 		}
-		private void filltreeX(AngleSharp.Dom.IElement subList, TreeNode topnode)
+		//private void filltree(AngleSharp.Dom.IElement subList, TreeNode topnode)
+		//{
+		//	var items = subList.Children;
+		//	foreach(var item in items)
+		//	{
+		//		entry ent = new entry();
+		//		ent.name = item.QuerySelector("cite.fn").TextContent;
+		//		ent.when = item.QuerySelector(".social-posted-when").TextContent;
+		//		ent.text = item.QuerySelector(".social-comment-body").TextContent;
+		//		ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
+		//		TreeNode tn = new TreeNode(ent.name + "  -  " + ent.when);
+		//		tn.Tag = ent;
+		//		topnode.Nodes.Add(tn);
+		//		var sublist = item.QuerySelector("ul"); // Unterliste?
+		//		if(sublist != null)
+		//			filltree(sublist, tn);
+		//	}
+		//}
+
+		private void markTreeNode(TreeNode tn)
 		{
-		}
-		private void filltree(AngleSharp.Dom.IElement subList, TreeNode topnode)
-		{
-			var items = subList.Children;
-			foreach(var item in items)
-			{
-				entry ent = new entry();
-				ent.name = item.QuerySelector("cite.fn").TextContent;
-				ent.when = item.QuerySelector(".social-posted-when").TextContent;
-				ent.text = item.QuerySelector(".social-comment-body").TextContent;
-				ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
-				TreeNode tn = new TreeNode(ent.name + "  -  " + ent.when);
-				tn.Tag = ent;
-				topnode.Nodes.Add(tn);
-				var sublist = item.QuerySelector("ul"); // Unterliste?
-				if(sublist != null)
-					filltree(sublist, tn);
-			}
+			entry ent = (entry)tn.Tag;
+			ent.seen = true;
+			tn.ForeColor = Color.Red;
+			seenSet.Add(ent.id);
 		}
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
-			textBox1.Clear();
-			entry ent = (entry)treeView1.SelectedNode.Tag;
-			textBox1.Text = ent.text;
+			richTextBox1.Clear();
+			TreeNode tn = treeView1.SelectedNode;
+			entry ent = (entry)tn.Tag;
+			richTextBox1.Text = ent.text;
 			if(!ent.seen)
-			{
-				ent.seen = true;
-				treeView1.SelectedNode.ForeColor = Color.Red;
-				treeView1.SelectedNode.Text += " <#";
-				seenSet.Add(ent.id);
-			}
+				markTreeNode(tn);
 		}
 
 		private void expandButton_Click(object sender, EventArgs e)
@@ -131,6 +178,20 @@ namespace BlogReader
 				treeView1.ExpandAll();
 				expanded = true;
 				expandButton.Text = "Alles zu";
+			}
+		}
+
+		private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
+		{
+			System.Diagnostics.Process.Start(e.LinkText);
+		}
+
+		private void textBoxUrl_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			if(e.KeyChar == '\r')
+			{
+				e.Handled = true;
+				loadButton_Click(null, null);
 			}
 		}
 	}
