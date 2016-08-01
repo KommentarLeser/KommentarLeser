@@ -220,20 +220,13 @@ namespace BlogReader
 
 		private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
 		{
-			var node = treeView1.SelectedNode;
-			if(node != null)
-			{
-				//node.Text = node.Text.Substring(0, node.Text.Length - 13);
-				//node.BackColor = Color.White;
-			}
+			
 		}
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
 			richTextBox1.Clear();
 			TreeNode tn = treeView1.SelectedNode;
-			//tn.BackColor = Color.LightGray;
-			//tn.Text += "  <==========";
 			entry ent = (entry)tn.Tag;
 			richTextBox1.Text = ent.text;
 			if(!ent.seen)
@@ -243,6 +236,10 @@ namespace BlogReader
 		private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
 		{
 			var node = treeView1.SelectedNode;
+			if(node.IsExpanded)
+				node.Collapse();
+			else
+				node.Expand();
 			System.Diagnostics.Process.Start(((entry)(node.Tag)).link);
 		}
 	}
