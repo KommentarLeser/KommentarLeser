@@ -7,8 +7,8 @@
     <ProjectGuid>{6C5DA490-68BD-40AA-86F1-60256816664E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BlogReader</RootNamespace>
-    <AssemblyName>BlogReader</AssemblyName>
+    <RootNamespace>KommentarLeser</RootNamespace>
+    <AssemblyName>KommentarLeser</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,8 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp">
-      <HintPath>..\..\..\__LW_C\DEVELOP\AngleSharp\src\AngleSharp\bin\Debug\v4.5\AngleSharp.dll</HintPath>
+    <Reference Include="AngleSharp, Version=0.9.7.14819, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\__LW_C\DEVELOP\AngleSharp\src\AngleSharp\bin\Release\v4.5\AngleSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +69,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
