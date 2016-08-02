@@ -87,6 +87,9 @@ namespace KommentarLeser
 					}
 					num = (i + 2).ToString();
 					mainUrl = "http://vineyardsaker.de/page/" + num;
+#if DEBUG
+					break;
+#endif
 				}
 			}
 			catch(Exception ex)
@@ -368,6 +371,8 @@ namespace KommentarLeser
 			{
 				foreach(Control c in Controls)
 					c.Enabled = true;
+				richTextBox1.ScrollBars = RichTextBoxScrollBars.None;
+				richTextBox1.ScrollBars = RichTextBoxScrollBars.Vertical;
 			}
 			else
 			{
