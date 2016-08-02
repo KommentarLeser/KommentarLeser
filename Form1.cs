@@ -13,7 +13,7 @@ using AngleSharp;
 using System.Reflection;  // for Version
 using System.Diagnostics; // for Version
 
-namespace BlogReader
+namespace KommentarLeser
 {
 	public partial class Form1 : Form
 	{
@@ -50,38 +50,10 @@ namespace BlogReader
 			FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 			_version = "v" + fileVersionInfo.ProductVersion;
 			Text = "KommentarLeser - " + _version;
-			readArticleList();
-			try
-			{
-				// zuletzt besuchte URL wiederherstellen
-				string loadUrlFile = this.progOptionPath + "lastUrl";
-				using(System.IO.StreamReader urlsw = new System.IO.StreamReader(loadUrlFile))
-				{
-					setUrl(urlsw.ReadLine());
-					this.textBoxUrl.Text = url;
-				}
-			}
-			catch(Exception ex)
-			{
-				url = "";
-				this.textBoxUrl.Text = "";
-			}
-			if(url == "")
-			{
-				if(this.comboBoxArticles.Items.Count > 0)
-				{
-					this.comboBoxArticles.SelectedIndex = 0;
-					this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
-					//this.loadButton_Click(null, null);
-				}
-			}
-			else
-			{
-				comboBoxArticles.SelectedIndex = findInCombobox(url);
-				//this.loadButton_Click(null, null);
-			}
+			enableAll(false);
 		}
-		int findInCombobox(string surl)
+
+		private int findInCombobox(string surl)
 		{
 			int ctr = 0;
 			foreach(articleEntry ent in comboBoxArticles.Items)
@@ -92,25 +64,42 @@ namespace BlogReader
 			}
 			return -1;
 		}
-		private void readArticleList()
+
+		private void readArticleList(Progress p)
 		{
-			byte[] bytes = this.webClient.DownloadData("http://vineyardsaker.de");
-			string html = Encoding.UTF8.GetString(bytes);
-			var doc = this.parser.Parse(html);
-			var list = doc.QuerySelectorAll(".entry-title");
-			foreach(var entry in list)
+			try
 			{
-				Form1.articleEntry ent = new Form1.articleEntry();
-				ent.name = entry.TextContent;
-				ent.setUrl(entry.QuerySelector("a").GetAttribute("href"));
-				this.comboBoxArticles.Items.Add(ent);
+				string num = "1";
+				string mainUrl = "http://vineyardsaker.de";
+				for(int i = 0; i < 5; ++i)
+				{
+					p.set(num);
+					byte[] bytes = webClient.DownloadData(mainUrl);
+					string html = Encoding.UTF8.GetString(bytes);
+					var doc = parser.Parse(html);
+					var list = doc.QuerySelectorAll("h1.entry-title");
+					foreach(var entry in list)
+					{
+						Form1.articleEntry ent = new Form1.articleEntry();
+						ent.name = entry.TextContent;
+						ent.setUrl(entry.QuerySelector("a").GetAttribute("href"));
+						comboBoxArticles.Items.Add(ent);
+					}
+					num = (i + 2).ToString();
+					mainUrl = "http://vineyardsaker.de/page/" + num;
+				}
 			}
+			catch(Exception ex)
+			{
+				MessageBox.Show("Fehler beim Lesen der Artikelliste\n" + ex.ToString());
+			}
+			p.set("");
 		}
 
 		private void comboBoxArticles_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
-			this.loadButton_Click(null, null);
+			textBoxUrl.Text = ((Form1.articleEntry)comboBoxArticles.SelectedItem).url;
+			loadButton_Click(null, null);
 		}
 		private class articleEntry
 		{
@@ -122,7 +111,7 @@ namespace BlogReader
 			}
 			public override string ToString()
 			{
-				return this.name;
+				return name;
 			}
 		}
 
@@ -141,17 +130,17 @@ namespace BlogReader
 			public bool seen = false;
 		}
 
-		string filenameFromUrl(string htmlUrl)
+		private string filenameFromUrl(string htmlUrl)
 		{
 			Utilities.sanitizeUrl(htmlUrl);
 			htmlUrl = htmlUrl.Replace(":", "%3A").Replace("/", "%2F").Trim();
 			return htmlUrl;
 		}
-		void setUrl(string inUrl)
+		private void setUrl(string inUrl)
 		{
 			url = Utilities.sanitizeUrl(inUrl);
 		}
-		void saveState()
+		private void saveState()
 		{
 			string urlFileName = filenameFromUrl(url);
 			string saveFile = progOptionPath + urlFileName;
@@ -171,7 +160,7 @@ namespace BlogReader
 			urlsw.Close();
 		}
 
-		void loadState()
+		void loadSeenSet()
 		{
 			string urlFileName = filenameFromUrl(url);
 			string loadFile = progOptionPath + urlFileName;
@@ -190,11 +179,12 @@ namespace BlogReader
 		}
 		private void loadButton_Click(object sender, EventArgs e)
 		{
-			UseWaitCursor = true;
-			Application.DoEvents();
-			setUrl(textBoxUrl.Text);
 			try
 			{
+				enableAll(false);
+				UseWaitCursor = true;
+				Application.DoEvents();
+				setUrl(textBoxUrl.Text);
 				byte[] bytes = webClient.DownloadData(url);
 				html = System.Text.Encoding.UTF8.GetString(bytes);
 				doc = parser.Parse(html);
@@ -208,8 +198,8 @@ namespace BlogReader
 			catch(Exception ex)
 			{
 				url = "";
+				list = null;
 				MessageBox.Show("Der Kommentarleser konnte die Adresse nicht interpretieren.");
-				return;
 			}
 			finally
 			{
@@ -222,12 +212,15 @@ namespace BlogReader
 					}
 					expandButton.Text = "Alles aufklappen";
 					expanded = false;
-					loadState(); // Liste der bereits gesehenen IDs laden
+					loadSeenSet(); // Liste der bereits gesehenen IDs laden
 					filltree(list, treeView1.Nodes);
+					
 					treeView1.SelectedNode = null;
 					richTextBox1.Clear();
+					expandButton.Select();
+					UseWaitCursor = false;
+					enableAll(true);
 				}
-				UseWaitCursor = false;
 			}
 		}
 		private void filltree(AngleSharp.Dom.IElement subList, TreeNodeCollection nodelist)
@@ -318,7 +311,72 @@ namespace BlogReader
 				node.Expand();
 			System.Diagnostics.Process.Start(((entry)(node.Tag)).link);
 		}
+
+		private void Form1_Shown(object sender, EventArgs e)
+		{
+			Progress p = null;
+			try
+			{
+				p = new Progress();
+				p.Text = "Lade Artikelliste...";
+				p.StartPosition = FormStartPosition.Manual;
+				Point pos = new Point((Width / 2) + Left - (p.Width / 2), ((Height) / 2) + Top - p.Height / 2);
+				p.Location = pos;
+				p.Show(this);
+				readArticleList(p);
+				p.Text = "Lade Artikel...";
+				try
+				{
+					// zuletzt besuchte URL wiederherstellen
+					string loadUrlFile = this.progOptionPath + "lastUrl";
+					using(System.IO.StreamReader urlsw = new System.IO.StreamReader(loadUrlFile))
+					{
+						setUrl(urlsw.ReadLine());
+						this.textBoxUrl.Text = url;
+					}
+				}
+				catch(Exception ex)
+				{
+					url = "";
+					this.textBoxUrl.Text = "";
+				}
+				if(url == "")
+				{
+					if(this.comboBoxArticles.Items.Count > 0)
+					{
+						this.comboBoxArticles.SelectedIndex = 0;
+						this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
+					}
+				}
+				else
+				{
+					comboBoxArticles.SelectedIndex = findInCombobox(url);
+				}
+			}
+			finally
+			{
+				expandButton.Select();
+				
+				p?.Close();
+				p = null;
+				enableAll(true);
+			}
+		}
+		private void enableAll(bool enable)
+		{
+			if(enable)
+			{
+				foreach(Control c in Controls)
+					c.Enabled = true;
+			}
+			else
+			{
+				foreach(Control c in Controls)
+					c.Enabled = false;
+			}
+		}
 	}
+	//class ProgressForm
 	class Utilities
 	{
 		public static string sanitizeUrl(string inUrl)
