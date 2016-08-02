@@ -35,6 +35,7 @@
 			this.textBoxUrl = new System.Windows.Forms.TextBox();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.comboBoxArticles = new System.Windows.Forms.ComboBox();
 			this.SuspendLayout();
 			// 
 			// treeView1
@@ -46,7 +47,6 @@
 			this.treeView1.Name = "treeView1";
 			this.treeView1.Size = new System.Drawing.Size(372, 655);
 			this.treeView1.TabIndex = 0;
-			this.treeView1.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeSelect);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
 			this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseDoubleClick);
 			// 
@@ -115,13 +115,22 @@
 			this.label1.Size = new System.Drawing.Size(48, 13);
 			this.label1.TabIndex = 7;
 			this.label1.Text = "Adresse:";
-			this.label1.Click += new System.EventHandler(this.label1_Click);
+			// 
+			// comboBoxArticles
+			// 
+			this.comboBoxArticles.FormattingEnabled = true;
+			this.comboBoxArticles.Location = new System.Drawing.Point(166, 41);
+			this.comboBoxArticles.Name = "comboBoxArticles";
+			this.comboBoxArticles.Size = new System.Drawing.Size(623, 21);
+			this.comboBoxArticles.TabIndex = 8;
+			this.comboBoxArticles.SelectedIndexChanged += new System.EventHandler(this.comboBoxArticles_SelectedIndexChanged);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1125, 737);
+			this.Controls.Add(this.comboBoxArticles);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.richTextBox1);
 			this.Controls.Add(this.textBoxUrl);
@@ -147,6 +156,7 @@
 		private System.Windows.Forms.TextBox textBoxUrl;
 		private System.Windows.Forms.RichTextBox richTextBox1;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.ComboBox comboBoxArticles;
 	}
 }
 

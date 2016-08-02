@@ -18,8 +18,9 @@ namespace BlogReader
 	public partial class Form1 : Form
 	{
 		private AngleSharp.Parser.Html.HtmlParser parser;
+		private string url;
 		private string html;
-		private string htmlUrl = "";
+		//private string urlFileName = "";
 		private string progOptionPath;
 		private string _version = "";
 		private AngleSharp.Dom.Html.IHtmlDocument doc;
@@ -49,6 +50,80 @@ namespace BlogReader
 			FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 			_version = "v" + fileVersionInfo.ProductVersion;
 			Text = "KommentarLeser - " + _version;
+			readArticleList();
+			try
+			{
+				// zuletzt besuchte URL wiederherstellen
+				string loadUrlFile = this.progOptionPath + "lastUrl";
+				using(System.IO.StreamReader urlsw = new System.IO.StreamReader(loadUrlFile))
+				{
+					setUrl(urlsw.ReadLine());
+					this.textBoxUrl.Text = url;
+				}
+			}
+			catch(Exception ex)
+			{
+				url = "";
+				this.textBoxUrl.Text = "";
+			}
+			if(url == "")
+			{
+				if(this.comboBoxArticles.Items.Count > 0)
+				{
+					this.comboBoxArticles.SelectedIndex = 0;
+					this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
+					//this.loadButton_Click(null, null);
+				}
+			}
+			else
+			{
+				comboBoxArticles.SelectedIndex = findInCombobox(url);
+				//this.loadButton_Click(null, null);
+			}
+		}
+		int findInCombobox(string surl)
+		{
+			int ctr = 0;
+			foreach(articleEntry ent in comboBoxArticles.Items)
+			{
+				if(ent.url == surl)
+					return ctr;
+				++ctr;
+			}
+			return -1;
+		}
+		private void readArticleList()
+		{
+			byte[] bytes = this.webClient.DownloadData("http://vineyardsaker.de");
+			string html = Encoding.UTF8.GetString(bytes);
+			var doc = this.parser.Parse(html);
+			var list = doc.QuerySelectorAll(".entry-title");
+			foreach(var entry in list)
+			{
+				Form1.articleEntry ent = new Form1.articleEntry();
+				ent.name = entry.TextContent;
+				ent.setUrl(entry.QuerySelector("a").GetAttribute("href"));
+				this.comboBoxArticles.Items.Add(ent);
+			}
+		}
+
+		private void comboBoxArticles_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
+			this.loadButton_Click(null, null);
+		}
+		private class articleEntry
+		{
+			public string name;
+			public string url;
+			public void setUrl(string inUrl)
+			{
+				url = Utilities.sanitizeUrl(inUrl);
+			}
+			public override string ToString()
+			{
+				return this.name;
+			}
 		}
 
 		private void exitButton_Click(object sender, EventArgs e)
@@ -65,20 +140,21 @@ namespace BlogReader
 			public string text;
 			public bool seen = false;
 		}
-		string sanitizeUrl(string htmlUrl)
+
+		string filenameFromUrl(string htmlUrl)
 		{
-			int raute = htmlUrl.LastIndexOf('#');
-			if(raute != -1)
-				htmlUrl = htmlUrl.Substring(0, raute);
-			char[] trims = { '/' };
-			htmlUrl = htmlUrl.TrimEnd(trims);
+			Utilities.sanitizeUrl(htmlUrl);
 			htmlUrl = htmlUrl.Replace(":", "%3A").Replace("/", "%2F").Trim();
 			return htmlUrl;
 		}
+		void setUrl(string inUrl)
+		{
+			url = Utilities.sanitizeUrl(inUrl);
+		}
 		void saveState()
 		{
-			htmlUrl = sanitizeUrl(htmlUrl);
-			string saveFile = progOptionPath + htmlUrl;
+			string urlFileName = filenameFromUrl(url);
+			string saveFile = progOptionPath + urlFileName;
 
 			System.IO.FileStream file = System.IO.File.Create(saveFile);
 			System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
@@ -87,11 +163,18 @@ namespace BlogReader
 				sw.WriteLine(id);
 			}
 			sw.Close();
+			string lastUrlFile = this.progOptionPath + "lastUrl";
+			System.IO.FileStream urlfile = System.IO.File.Create(lastUrlFile);
+			System.IO.StreamWriter urlsw = new System.IO.StreamWriter(urlfile);
+			urlsw.WriteLine(this.textBoxUrl.Text);
+			
+			urlsw.Close();
 		}
+
 		void loadState()
 		{
-			htmlUrl = sanitizeUrl(htmlUrl);
-			string loadFile = progOptionPath + htmlUrl;
+			string urlFileName = filenameFromUrl(url);
+			string loadFile = progOptionPath + urlFileName;
 			string[] lines;
 			try
 			{
@@ -108,10 +191,11 @@ namespace BlogReader
 		private void loadButton_Click(object sender, EventArgs e)
 		{
 			UseWaitCursor = true;
-			string htmlname = textBoxUrl.Text;
+			Application.DoEvents();
+			setUrl(textBoxUrl.Text);
 			try
 			{
-				byte[] bytes = webClient.DownloadData(htmlname);
+				byte[] bytes = webClient.DownloadData(url);
 				html = System.Text.Encoding.UTF8.GetString(bytes);
 				doc = parser.Parse(html);
 				var div = doc?.QuerySelector(".social-comments");
@@ -123,7 +207,8 @@ namespace BlogReader
 			}
 			catch(Exception ex)
 			{
-				MessageBox.Show("Der Kommnetarleser konnte die Adresse nicht interpretieren.");
+				url = "";
+				MessageBox.Show("Der Kommentarleser konnte die Adresse nicht interpretieren.");
 				return;
 			}
 			finally
@@ -135,11 +220,12 @@ namespace BlogReader
 						saveState(); // Altes seenSet abspeichern
 						treeView1.Nodes.Clear();
 					}
-					htmlUrl = htmlname;
 					expandButton.Text = "Alles aufklappen";
 					expanded = false;
 					loadState(); // Liste der bereits gesehenen IDs laden
 					filltree(list, treeView1.Nodes);
+					treeView1.SelectedNode = null;
+					richTextBox1.Clear();
 				}
 				UseWaitCursor = false;
 			}
@@ -207,20 +293,10 @@ namespace BlogReader
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if(treeView1.Nodes.Count > 0 && htmlUrl != "")
+			if(treeView1.Nodes.Count > 0 && url != "")
 			{
 				saveState();
 			}
-		}
-
-		private void label1_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
-		{
-			
 		}
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -241,6 +317,18 @@ namespace BlogReader
 			else
 				node.Expand();
 			System.Diagnostics.Process.Start(((entry)(node.Tag)).link);
+		}
+	}
+	class Utilities
+	{
+		public static string sanitizeUrl(string inUrl)
+		{
+			int raute = inUrl.LastIndexOf('#');
+			if(raute != -1)
+				inUrl = inUrl.Substring(0, raute);
+			char[] trims = { '/' };
+			inUrl = inUrl.TrimEnd(trims);
+			return inUrl;
 		}
 	}
 }
