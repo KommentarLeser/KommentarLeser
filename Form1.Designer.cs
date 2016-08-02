@@ -1,4 +1,4 @@
-﻿namespace BlogReader
+﻿namespace KommentarLeser
 {
 	partial class Form1
 	{
@@ -142,6 +142,7 @@
 			this.Text = "Sakers Kommentarleser";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.Load += new System.EventHandler(this.Form1_Load);
+			this.Shown += new System.EventHandler(this.Form1_Shown);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
