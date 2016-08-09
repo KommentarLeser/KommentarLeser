@@ -22,5 +22,41 @@ namespace KommentarLeser.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"\"")]
+        public string lastComment {
+            get {
+                return ((string)(this["lastComment"]));
+            }
+            set {
+                this["lastComment"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool upgradeRequired {
+            get {
+                return ((bool)(this["upgradeRequired"]));
+            }
+            set {
+                this["upgradeRequired"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool expanded {
+            get {
+                return ((bool)(this["expanded"]));
+            }
+            set {
+                this["expanded"] = value;
+            }
+        }
     }
 }

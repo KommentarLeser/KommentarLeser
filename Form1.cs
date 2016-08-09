@@ -27,7 +27,7 @@ namespace KommentarLeser
 		private AngleSharp.Dom.IElement list;
 		private bool expanded = false;
 		private SortedSet<string> seenSet = new SortedSet<string>();
-
+		private string selectedCommentId = "";
 		private System.Net.WebClient webClient = new System.Net.WebClient();
 
 		public Form1()
@@ -102,6 +102,9 @@ namespace KommentarLeser
 		private void comboBoxArticles_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			textBoxUrl.Text = ((Form1.articleEntry)comboBoxArticles.SelectedItem).url;
+			selectedCommentId = "";
+			Properties.Settings.Default.lastComment = selectedCommentId;
+			Properties.Settings.Default.Save();
 			loadButton_Click(null, null);
 		}
 		private class articleEntry
@@ -146,9 +149,9 @@ namespace KommentarLeser
 		private void saveState()
 		{
 			string urlFileName = filenameFromUrl(url);
-			string saveFile = progOptionPath + urlFileName;
+			string saveFileNAme = progOptionPath + urlFileName;
 
-			System.IO.FileStream file = System.IO.File.Create(saveFile);
+			System.IO.FileStream file = System.IO.File.Create(saveFileNAme);
 			System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
 			foreach(var id in seenSet)
 			{
@@ -159,10 +162,21 @@ namespace KommentarLeser
 			System.IO.FileStream urlfile = System.IO.File.Create(lastUrlFile);
 			System.IO.StreamWriter urlsw = new System.IO.StreamWriter(urlfile);
 			urlsw.WriteLine(this.textBoxUrl.Text);
-			
 			urlsw.Close();
+			Properties.Settings.Default.expanded = expanded;
+			Properties.Settings.Default.Save();
 		}
-
+		void updateText()
+		{
+			TreeNode tn = treeView1.SelectedNode;
+			entry ent = (entry)tn?.Tag;
+			if(ent == null)
+				return;
+			richTextBox1.Clear();
+			richTextBox1.Text = ent.text;
+			if(!ent.seen)
+				markTreeNode(tn);
+		}
 		void loadSeenSet()
 		{
 			string urlFileName = filenameFromUrl(url);
@@ -213,13 +227,16 @@ namespace KommentarLeser
 						saveState(); // Altes seenSet abspeichern
 						treeView1.Nodes.Clear();
 					}
-					expandButton.Text = "Alles aufklappen";
-					expanded = false;
 					loadSeenSet(); // Liste der bereits gesehenen IDs laden
 					filltree(list, treeView1.Nodes);
-					
-					treeView1.SelectedNode = null;
-					richTextBox1.Clear();
+					if(expanded)
+						expand();
+					else
+						collapse();
+					if(selectedCommentId != "")
+						treeView1.SelectedNode = findNodeById(ref selectedCommentId, treeView1.Nodes);
+					else
+						richTextBox1.Clear();
 					expandButton.Select();
 					UseWaitCursor = false;
 					enableAll(true);
@@ -261,15 +278,16 @@ namespace KommentarLeser
 		{
 			if(expanded)
 			{
-				treeView1.CollapseAll();
-				expanded = false;
-				expandButton.Text = "Alles aufklappen";
+				var temp = treeView1.SelectedNode;
+				bool isex = treeView1.SelectedNode.IsExpanded;
+				collapse();
+				treeView1.SelectedNode = temp;
+				if(isex)
+					treeView1.SelectedNode.ExpandAll();
 			}
 			else
 			{
-				treeView1.ExpandAll();
-				expanded = true;
-				expandButton.Text = "Alles zuklappen";
+				expand();
 			}
 		}
 
@@ -297,12 +315,10 @@ namespace KommentarLeser
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
-			richTextBox1.Clear();
-			TreeNode tn = treeView1.SelectedNode;
-			entry ent = (entry)tn.Tag;
-			richTextBox1.Text = ent.text;
-			if(!ent.seen)
-				markTreeNode(tn);
+			updateText();
+			selectedCommentId = ((entry)treeView1.SelectedNode.Tag).id;
+			Properties.Settings.Default.lastComment = selectedCommentId;
+			Properties.Settings.Default.Save();
 		}
 
 		private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -317,53 +333,108 @@ namespace KommentarLeser
 
 		private void Form1_Shown(object sender, EventArgs e)
 		{
+			UseWaitCursor = true;
 			Progress p = null;
 			try
 			{
 				p = new Progress();
-				p.Text = "Lade Artikelliste...";
 				p.StartPosition = FormStartPosition.Manual;
 				Point pos = new Point((Width / 2) + Left - (p.Width / 2), ((Height) / 2) + Top - p.Height / 2);
 				p.Location = pos;
 				p.Show(this);
-				readArticleList(p);
-				p.Text = "Lade Artikel...";
-				try
-				{
-					// zuletzt besuchte URL wiederherstellen
-					string loadUrlFile = this.progOptionPath + "lastUrl";
-					using(System.IO.StreamReader urlsw = new System.IO.StreamReader(loadUrlFile))
-					{
-						setUrl(urlsw.ReadLine());
-						this.textBoxUrl.Text = url;
-					}
-				}
-				catch(Exception ex)
-				{
-					url = "";
-					this.textBoxUrl.Text = "";
-				}
-				if(url == "")
-				{
-					if(this.comboBoxArticles.Items.Count > 0)
-					{
-						this.comboBoxArticles.SelectedIndex = 0;
-						this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
-					}
-				}
-				else
-				{
-					comboBoxArticles.SelectedIndex = findInCombobox(url);
-				}
+				p.Text = "Lade Artikelliste...";
+				restoreArticleList(p);
+				restoreUrl(p);
+				restoreState();
 			}
 			finally
 			{
-				expandButton.Select();
-				
 				p?.Close();
 				p = null;
+				expandButton.Select();
 				enableAll(true);
+				UseWaitCursor = false;
 			}
+		}
+
+		string restoreArticleList(Progress p)
+		{
+			if(Properties.Settings.Default.upgradeRequired)
+			{
+				Properties.Settings.Default.Upgrade();
+				Properties.Settings.Default.upgradeRequired = false;
+				Properties.Settings.Default.Save();
+			}
+			readArticleList(p);
+			try
+			{
+				// zuletzt besuchte URL wiederherstellen
+				string loadUrlFile = this.progOptionPath + "lastUrl";
+				using(System.IO.StreamReader urlsw = new System.IO.StreamReader(loadUrlFile))
+				{
+					setUrl(urlsw.ReadLine());
+					this.textBoxUrl.Text = url;
+				}
+			}
+			catch(Exception ex)
+			{
+				url = "";
+				this.textBoxUrl.Text = "";
+			}
+			return url;
+		}
+
+		void restoreUrl(Progress p)
+		{
+			p.Text = "Lade Artikel...";
+			if(url == "")
+			{
+				if(this.comboBoxArticles.Items.Count > 0)
+				{
+					this.comboBoxArticles.SelectedIndex = 0;
+					this.textBoxUrl.Text = ((Form1.articleEntry)this.comboBoxArticles.SelectedItem).url;
+				}
+			}
+			else
+			{
+				string temp = Properties.Settings.Default.lastComment;
+				comboBoxArticles.SelectedIndex = findInCombobox(url);
+				Properties.Settings.Default.lastComment = temp;
+			}
+		}
+		void expand() {
+			expanded = true;
+			treeView1.ExpandAll();
+			expandButton.Text = "alles zuklappen";
+		}
+		void collapse() {
+			expanded = false;
+			treeView1.CollapseAll();
+			expandButton.Text = "alles aufklappen";
+			updateText();
+		}
+		void restoreState()
+		{
+			selectedCommentId = Properties.Settings.Default.lastComment;
+			if(selectedCommentId != "")
+			{
+				treeView1.SelectedNode = findNodeById(ref selectedCommentId, treeView1.Nodes);
+			}
+			bool expanded = Properties.Settings.Default.expanded;
+			if(expanded)
+				expand();
+		}
+		TreeNode findNodeById(ref string id, TreeNodeCollection nodes)
+		{
+			foreach(TreeNode node in nodes)
+			{
+				if(((entry)(node.Tag)).id == id)
+					return node;
+				var found = findNodeById(ref id, node.Nodes);
+				if(found != null)
+					return found; 
+			}
+			return null;
 		}
 		private void enableAll(bool enable)
 		{
