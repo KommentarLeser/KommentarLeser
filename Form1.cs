@@ -275,15 +275,15 @@ namespace KommentarLeser
 					if(selectedCommentId != "") // wird bei Artikelwechsel auf "" gesetzt.
 						treeView1.SelectedNode = findNodeById(ref selectedCommentId, treeView1.Nodes);
 					else
+					{
 						richTextBox1.Clear();
+						treeView1.SelectedNode = null;
+					}
 					expandButton.Select();
+					treeView1.SelectedNode = treeView1.Nodes?[0];
 					UseWaitCursor = false;
 					enableAll(true);
-					BringToFront();
-					//Select();
-					//richTextBox1.Select();
-					treeView1.Select();
-					treeView1.Focus();
+					richTextBox1.Focus();
 				}
 			}
 		}
@@ -458,7 +458,7 @@ namespace KommentarLeser
 			expanded = false;
 			treeView1.CollapseAll();
 			expandButton.Text = "alles aufklappen";
-			updateText();
+			updateText(); // beim Zuklappen wechselt u.U. der Node
 		}
 		
 		TreeNode findNodeById(ref string id, TreeNodeCollection nodes)
