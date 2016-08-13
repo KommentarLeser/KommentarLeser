@@ -3,6 +3,7 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+v1.0.0.11 - Bugfix: der letzte Kommentar wurde nicht wiederausgewählt.  
 v1.0.0.10 - Kleinigkeiten in der Handhabung.  
 v1.0.0.9 - Einträge können markiert werden.  
 v1.0.0.8 - Handhabung verbessert.  

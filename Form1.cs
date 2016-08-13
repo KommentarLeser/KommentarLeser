@@ -277,10 +277,9 @@ namespace KommentarLeser
 					else
 					{
 						richTextBox1.Clear();
-						treeView1.SelectedNode = null;
+						treeView1.SelectedNode = treeView1.Nodes?[0];
 					}
-					expandButton.Select();
-					treeView1.SelectedNode = treeView1.Nodes?[0];
+					//expandButton.Select();
 					UseWaitCursor = false;
 					enableAll(true);
 					richTextBox1.Focus();
