@@ -27,6 +27,7 @@ namespace KommentarLeser
 		private AngleSharp.Dom.IElement list;
 		private bool expanded = false;
 		private SortedSet<string> seenSet = new SortedSet<string>();
+		private SortedSet<string> checkedSet = new SortedSet<string>();
 		private string selectedCommentId = "";
 		private System.Net.WebClient webClient = new System.Net.WebClient();
 
@@ -146,18 +147,37 @@ namespace KommentarLeser
 		{
 			url = Utilities.sanitizeUrl(inUrl);
 		}
+		void restoreState()
+		{
+			selectedCommentId = Properties.Settings.Default.lastComment;
+			if(selectedCommentId != "")
+			{
+				treeView1.SelectedNode = findNodeById(ref selectedCommentId, treeView1.Nodes);
+			}
+			bool expanded = Properties.Settings.Default.expanded;
+			if(expanded)
+				expand();
+		}
 		private void saveState()
 		{
 			string urlFileName = filenameFromUrl(url);
-			string saveFileNAme = progOptionPath + urlFileName;
+			string saveFileName = progOptionPath + urlFileName;
 
-			System.IO.FileStream file = System.IO.File.Create(saveFileNAme);
+			System.IO.FileStream file = System.IO.File.Create(saveFileName);
 			System.IO.StreamWriter sw = new System.IO.StreamWriter(file);
 			foreach(var id in seenSet)
 			{
 				sw.WriteLine(id);
 			}
 			sw.Close();
+			saveFileName += ".checked";
+			System.IO.FileStream checkedfile = System.IO.File.Create(saveFileName);
+			System.IO.StreamWriter checkedsw = new System.IO.StreamWriter(checkedfile);
+			foreach(var id in checkedSet)
+			{
+				checkedsw.WriteLine(id);
+			}
+			checkedsw.Close();
 			string lastUrlFile = this.progOptionPath + "lastUrl";
 			System.IO.FileStream urlfile = System.IO.File.Create(lastUrlFile);
 			System.IO.StreamWriter urlsw = new System.IO.StreamWriter(urlfile);
@@ -194,6 +214,24 @@ namespace KommentarLeser
 				return;
 			}
 		}
+		void loadCheckedSet()
+		{
+			string urlFileName = filenameFromUrl(url);
+			string loadFile = progOptionPath + urlFileName + ".checked";
+			string[] lines;
+			try
+			{
+				lines = System.IO.File.ReadAllLines(loadFile);
+				checkedSet.Clear();
+				foreach(string id in lines)
+					checkedSet.Add(id);
+			}
+			catch(Exception)
+			{
+				return;
+			}
+		}
+
 		private void loadButton_Click(object sender, EventArgs e)
 		{
 			try
@@ -224,10 +262,11 @@ namespace KommentarLeser
 				{
 					if(treeView1.Nodes.Count != 0)
 					{
-						saveState(); // Altes seenSet abspeichern
+						saveState(); // Altes seenSet/checkedSet abspeichern
 						treeView1.Nodes.Clear();
 					}
 					loadSeenSet(); // Liste der bereits gesehenen IDs laden
+					loadCheckedSet();
 					filltree(list, treeView1.Nodes);
 					if(expanded)
 						expand();
@@ -264,6 +303,9 @@ namespace KommentarLeser
 				tn.Tag = ent;
 				if(seenSet.Contains(ent.id))
 					markTreeNode(tn);
+				if(checkedSet.Contains(ent.id))
+					tn.Checked = true;
+
 				nodelist.Add(tn);
 				var sublist = item.QuerySelector("ul"); // Unterliste?
 				if(sublist != null)
@@ -418,17 +460,7 @@ namespace KommentarLeser
 			expandButton.Text = "alles aufklappen";
 			updateText();
 		}
-		void restoreState()
-		{
-			selectedCommentId = Properties.Settings.Default.lastComment;
-			if(selectedCommentId != "")
-			{
-				treeView1.SelectedNode = findNodeById(ref selectedCommentId, treeView1.Nodes);
-			}
-			bool expanded = Properties.Settings.Default.expanded;
-			if(expanded)
-				expand();
-		}
+		
 		TreeNode findNodeById(ref string id, TreeNodeCollection nodes)
 		{
 			foreach(TreeNode node in nodes)
@@ -482,6 +514,14 @@ namespace KommentarLeser
 			BringToFront();
 			richTextBox1.Select();
 			//Select(true, true);
+		}
+
+		private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
+		{
+			if(e.Node.Checked)
+				checkedSet.Add(((entry)e.Node.Tag).id);
+			else
+				checkedSet.Remove(((entry)e.Node.Tag).id);
 		}
 	}
 	//class ProgressForm

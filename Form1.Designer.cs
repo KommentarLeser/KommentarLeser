@@ -42,11 +42,13 @@
 			// 
 			this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.treeView1.CheckBoxes = true;
 			this.treeView1.HideSelection = false;
 			this.treeView1.Location = new System.Drawing.Point(12, 70);
 			this.treeView1.Name = "treeView1";
 			this.treeView1.Size = new System.Drawing.Size(372, 655);
 			this.treeView1.TabIndex = 2;
+			this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
 			this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseDoubleClick);
 			this.treeView1.MouseEnter += new System.EventHandler(this.treeView1_MouseEnter);
