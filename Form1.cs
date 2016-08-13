@@ -233,13 +233,18 @@ namespace KommentarLeser
 						expand();
 					else
 						collapse();
-					if(selectedCommentId != "")
+					if(selectedCommentId != "") // wird bei Artikelwechsel auf "" gesetzt.
 						treeView1.SelectedNode = findNodeById(ref selectedCommentId, treeView1.Nodes);
 					else
 						richTextBox1.Clear();
 					expandButton.Select();
 					UseWaitCursor = false;
 					enableAll(true);
+					BringToFront();
+					//Select();
+					//richTextBox1.Select();
+					treeView1.Select();
+					treeView1.Focus();
 				}
 			}
 		}
@@ -450,6 +455,33 @@ namespace KommentarLeser
 				foreach(Control c in Controls)
 					c.Enabled = false;
 			}
+		}
+
+		private void richTextBox1_MouseEnter(object sender, EventArgs e)
+		{
+			richTextBox1.Select();
+		}
+
+		private void treeView1_MouseEnter(object sender, EventArgs e)
+		{
+			treeView1.Select();
+		}
+
+		private void comboBoxArticles_MouseDown(object sender, MouseEventArgs e)
+		{
+			comboBoxArticles.DroppedDown = true;
+		}
+
+		private void loadButton_MouseEnter(object sender, EventArgs e)
+		{
+			loadButton.Select();
+		}
+
+		private void loadButton_MouseLeave(object sender, EventArgs e)
+		{
+			BringToFront();
+			richTextBox1.Select();
+			//Select(true, true);
 		}
 	}
 	//class ProgressForm

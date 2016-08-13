@@ -46,9 +46,10 @@
 			this.treeView1.Location = new System.Drawing.Point(12, 70);
 			this.treeView1.Name = "treeView1";
 			this.treeView1.Size = new System.Drawing.Size(372, 655);
-			this.treeView1.TabIndex = 0;
+			this.treeView1.TabIndex = 2;
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
 			this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseDoubleClick);
+			this.treeView1.MouseEnter += new System.EventHandler(this.treeView1_MouseEnter);
 			// 
 			// loadButton
 			// 
@@ -56,9 +57,11 @@
 			this.loadButton.Name = "loadButton";
 			this.loadButton.Size = new System.Drawing.Size(97, 23);
 			this.loadButton.TabIndex = 1;
-			this.loadButton.Text = "laden";
+			this.loadButton.Text = "(neu) laden";
 			this.loadButton.UseVisualStyleBackColor = true;
 			this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
+			this.loadButton.MouseEnter += new System.EventHandler(this.loadButton_MouseEnter);
+			this.loadButton.MouseLeave += new System.EventHandler(this.loadButton_MouseLeave);
 			// 
 			// exitButton
 			// 
@@ -77,7 +80,7 @@
 			this.expandButton.Name = "expandButton";
 			this.expandButton.Size = new System.Drawing.Size(97, 23);
 			this.expandButton.TabIndex = 4;
-			this.expandButton.Text = "Alles aufklappen";
+			this.expandButton.Text = "alles aufklappen";
 			this.expandButton.UseVisualStyleBackColor = true;
 			this.expandButton.Click += new System.EventHandler(this.expandButton_Click);
 			// 
@@ -98,15 +101,17 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.richTextBox1.BackColor = System.Drawing.Color.Gainsboro;
+			this.richTextBox1.Cursor = System.Windows.Forms.Cursors.Default;
 			this.richTextBox1.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.richTextBox1.Location = new System.Drawing.Point(390, 70);
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.richTextBox1.Size = new System.Drawing.Size(723, 655);
-			this.richTextBox1.TabIndex = 6;
+			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
+			this.richTextBox1.MouseEnter += new System.EventHandler(this.richTextBox1_MouseEnter);
 			// 
 			// label1
 			// 
@@ -125,6 +130,7 @@
 			this.comboBoxArticles.Size = new System.Drawing.Size(623, 21);
 			this.comboBoxArticles.TabIndex = 8;
 			this.comboBoxArticles.SelectedIndexChanged += new System.EventHandler(this.comboBoxArticles_SelectedIndexChanged);
+			this.comboBoxArticles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.comboBoxArticles_MouseDown);
 			// 
 			// Form1
 			// 
