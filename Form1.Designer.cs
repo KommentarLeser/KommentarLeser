@@ -103,7 +103,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.richTextBox1.BackColor = System.Drawing.Color.Gainsboro;
-			this.richTextBox1.Cursor = System.Windows.Forms.Cursors.Default;
+			this.richTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.richTextBox1.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.richTextBox1.Location = new System.Drawing.Point(390, 70);
 			this.richTextBox1.Name = "richTextBox1";
@@ -147,11 +147,13 @@
 			this.Controls.Add(this.exitButton);
 			this.Controls.Add(this.loadButton);
 			this.Controls.Add(this.treeView1);
+			this.KeyPreview = true;
 			this.Name = "Form1";
 			this.Text = "Sakers Kommentarleser";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.Shown += new System.EventHandler(this.Form1_Shown);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

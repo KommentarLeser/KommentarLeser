@@ -522,6 +522,15 @@ namespace KommentarLeser
 			else
 				checkedSet.Remove(((entry)e.Node.Tag).id);
 		}
+
+		private void Form1_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.F5)
+			{
+				e.Handled = true;
+				loadButton_Click(null, null);
+			}
+		}
 	}
 	//class ProgressForm
 	class Utilities
