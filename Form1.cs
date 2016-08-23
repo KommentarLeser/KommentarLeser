@@ -12,6 +12,7 @@ using AngleSharp;
 
 using System.Reflection;  // for Version
 using System.Diagnostics; // for Version
+using System.Collections;
 
 namespace KommentarLeser
 {
@@ -24,7 +25,8 @@ namespace KommentarLeser
 		private string progOptionPath;
 		private string _version = "";
 		private AngleSharp.Dom.Html.IHtmlDocument doc;
-		private AngleSharp.Dom.IElement list;
+		private AngleSharp.Dom.IElement commentList;
+		private System.Collections.Generic.SortedDictionary<string, System.Collections.Generic.List<TreeNode>> _userNames;
 		private bool expanded = false;
 		private SortedSet<string> seenSet = new SortedSet<string>();
 		private SortedSet<string> checkedSet = new SortedSet<string>();
@@ -51,6 +53,7 @@ namespace KommentarLeser
 			FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 			_version = "v" + fileVersionInfo.ProductVersion;
 			Text = "KommentarLeser - " + _version;
+			_userNames = new SortedDictionary<string, List<TreeNode>>();
 			enableAll(false);
 		}
 
@@ -244,30 +247,60 @@ namespace KommentarLeser
 				html = System.Text.Encoding.UTF8.GetString(bytes);
 				doc = parser.Parse(html);
 				var div = doc?.QuerySelector(".social-comments");
-				list = div?.QuerySelector(".social-commentlist");
-				if(list == null)
-					list = div?.QuerySelector(".commentlist");
-				if(list == null)
+				commentList = div?.QuerySelector(".social-commentlist");
+				if(commentList == null)
+					commentList = div?.QuerySelector(".commentlist");
+				if(commentList == null)
 					throw new Exception("list == null");
 			}
 			catch(Exception ex)
 			{
 				url = "";
-				list = null;
+				commentList = null;
 				MessageBox.Show("Der Kommentarleser konnte die Adresse nicht interpretieren.");
 			}
 			finally
 			{
-				if(list != null) // wir konnten parsen
+				if(commentList != null) // wir konnten parsen
 				{
 					if(treeView1.Nodes.Count != 0)
 					{
 						saveState(); // Altes seenSet/checkedSet abspeichern
 						treeView1.Nodes.Clear();
 					}
+					var div = doc?.QuerySelector(".entry-content");
+					if(div == null)
+						throw new Exception("Kann Artikel nicht finden.");
+					entry ent = new entry();
+					ent.name = "Artikel";
+					ent.id = "Artikel";
+					ent.when = "";
+					ent.link = url;
+					ent.text = div.TextContent;
+					ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
+					TreeNode tn = new TreeNode(ent.name);
+					tn.Tag = ent;
+					treeView1.Nodes.Add(tn);
+
 					loadSeenSet(); // Liste der bereits gesehenen IDs laden
 					loadCheckedSet();
-					filltree(list, treeView1.Nodes);
+
+					_userNames.Clear();
+					filltree(commentList, treeView1.Nodes[0].Nodes);
+					comboBoxNutzer.Items.Clear();
+					foreach(var nutzer in _userNames)
+					{
+						comboBoxNutzer.Items.Add(nutzer.Key);
+					}
+					int idx = comboBoxNutzer.Items.IndexOf("Russophilus");
+					if(idx != -1)
+					{
+						//var temp = comboBoxNutzer.Items[idx];
+						//comboBoxNutzer.Items.RemoveAt(idx);
+						comboBoxNutzer.Items.Insert(0, "Russophilus");
+						comboBoxNutzer.SelectedIndex = 0;
+					}
+
 					if(expanded)
 						expand();
 					else
@@ -306,6 +339,9 @@ namespace KommentarLeser
 					tn.Checked = true;
 
 				nodelist.Add(tn);
+				if(!_userNames.ContainsKey(ent.name))
+					_userNames.Add(ent.name, new System.Collections.Generic.List<TreeNode>());
+				_userNames[ent.name].Add(tn);
 				var sublist = item.QuerySelector("ul"); // Unterliste?
 				if(sublist != null)
 					filltree(sublist, tn.Nodes);
@@ -531,8 +567,63 @@ namespace KommentarLeser
 				loadButton_Click(null, null);
 			}
 		}
+		System.Collections.Generic.List<TreeNode> _lastSelectedUserList = new System.Collections.Generic.List<TreeNode>();
+		private void comboBoxNutzer_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			foreach(TreeNode node in _lastSelectedUserList)
+				node.BackColor = treeView1.BackColor;
+			_lastSelectedUserList = _userNames[(string)comboBoxNutzer.SelectedItem];
+			foreach(TreeNode node in _lastSelectedUserList)
+			{
+				node.BackColor = Color.LightGray;
+			}
+		}
+
+		private void comboBoxNutzer_MouseDown(object sender, MouseEventArgs e)
+		{
+			//comboBoxNutzer.DroppedDown = true;
+		}
+
+		private void comboBoxNutzer_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.Enter)
+			{
+				//e.SuppressKeyPress = true;
+				e.Handled = true;
+				//comboBoxNutzer.DroppedDown = false;
+				//treeView1.Select();
+			}
+		}
+
+		private void buttonSuche_Click(object sender, EventArgs e)
+		{
+			textBoxSuche.Text = textBoxSuche.Text.Trim();
+			string suchtext = textBoxSuche.Text.ToLower();
+			if(treeView1.Nodes.Count == 0)
+				return;
+			TVEnumerable enu = new TVEnumerable(treeView1.Nodes[0].Nodes);
+			//var nodeFont = treeView1.Nodes[0].NodeFont;
+			var nodeFont = treeView1.Font;
+			Font regularFont = new Font(nodeFont, FontStyle.Regular);
+
+			if(textBoxSuche.Text == "")
+			{
+				foreach(TreeNode node in enu)
+					node.NodeFont = regularFont;
+				return;
+			}
+			Font boldFont = new Font(nodeFont, FontStyle.Underline);
+			foreach(TreeNode node in enu)
+			{
+				var lowercase = ((entry)node.Tag).text.ToLower();
+				if(lowercase.Contains(suchtext))
+					node.NodeFont = boldFont;
+				else
+					node.NodeFont = regularFont;
+			}
+		}
 	}
-	//class ProgressForm
+	
 	class Utilities
 	{
 		public static string sanitizeUrl(string inUrl)
@@ -543,6 +634,78 @@ namespace KommentarLeser
 			char[] trims = { '/' };
 			inUrl = inUrl.TrimEnd(trims);
 			return inUrl;
+		}
+	}
+	class TVEnumerable : IEnumerable<TreeNode>
+	{
+		TreeNodeCollection _nodes;
+		public TVEnumerable(TreeNodeCollection nodes)
+		{
+			_nodes = nodes;
+		}
+		public IEnumerator<TreeNode> GetEnumerator()
+		{
+			return new TVEnumerator(_nodes);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new TVEnumerator(_nodes);
+		}
+	}
+
+	class TVEnumerator : IEnumerator<TreeNode>
+	{
+		System.Collections.Generic.List<TreeNode> _nodes = new System.Collections.Generic.List<TreeNode>();
+		int _pos = -1;
+		public TVEnumerator(TreeNodeCollection nodes)
+		{
+			iterate(nodes);
+		}
+		void iterate(TreeNodeCollection nodes)
+		{
+			foreach(TreeNode node in nodes)
+			{
+				_nodes.Add(node);
+				iterate(node.Nodes);
+			}
+		}
+		public TreeNode Current
+		{
+			get
+			{
+				return _nodes[_pos];
+			}
+		}
+		TreeNode IEnumerator<TreeNode>.Current
+		{
+			get
+			{
+				return Current;
+			}
+		}
+
+		object IEnumerator.Current
+		{
+			get
+			{
+				return Current;
+			}
+		}
+
+		public void Dispose()
+		{
+			_nodes = null;
+		}
+
+		public bool MoveNext()
+		{
+			return (++_pos < _nodes.Count);
+		}
+
+		public void Reset()
+		{
+			_pos = -1;
 		}
 	}
 }

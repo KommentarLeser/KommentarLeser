@@ -30,12 +30,15 @@
 		{
 			this.treeView1 = new System.Windows.Forms.TreeView();
 			this.loadButton = new System.Windows.Forms.Button();
-			this.exitButton = new System.Windows.Forms.Button();
 			this.expandButton = new System.Windows.Forms.Button();
 			this.textBoxUrl = new System.Windows.Forms.TextBox();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.comboBoxArticles = new System.Windows.Forms.ComboBox();
+			this.comboBoxNutzer = new System.Windows.Forms.ComboBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.textBoxSuche = new System.Windows.Forms.TextBox();
+			this.buttonSuche = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// treeView1
@@ -65,17 +68,6 @@
 			this.loadButton.MouseEnter += new System.EventHandler(this.loadButton_MouseEnter);
 			this.loadButton.MouseLeave += new System.EventHandler(this.loadButton_MouseLeave);
 			// 
-			// exitButton
-			// 
-			this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.exitButton.Location = new System.Drawing.Point(1041, 15);
-			this.exitButton.Name = "exitButton";
-			this.exitButton.Size = new System.Drawing.Size(72, 26);
-			this.exitButton.TabIndex = 2;
-			this.exitButton.Text = "beenden";
-			this.exitButton.UseVisualStyleBackColor = true;
-			this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
-			// 
 			// expandButton
 			// 
 			this.expandButton.Location = new System.Drawing.Point(9, 41);
@@ -93,7 +85,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBoxUrl.Location = new System.Drawing.Point(166, 15);
 			this.textBoxUrl.Name = "textBoxUrl";
-			this.textBoxUrl.Size = new System.Drawing.Size(869, 20);
+			this.textBoxUrl.Size = new System.Drawing.Size(866, 20);
 			this.textBoxUrl.TabIndex = 5;
 			this.textBoxUrl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxUrl_KeyPress);
 			// 
@@ -109,7 +101,7 @@
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.richTextBox1.Size = new System.Drawing.Size(723, 655);
+			this.richTextBox1.Size = new System.Drawing.Size(717, 655);
 			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -129,22 +121,65 @@
 			this.comboBoxArticles.FormattingEnabled = true;
 			this.comboBoxArticles.Location = new System.Drawing.Point(166, 41);
 			this.comboBoxArticles.Name = "comboBoxArticles";
-			this.comboBoxArticles.Size = new System.Drawing.Size(623, 21);
+			this.comboBoxArticles.Size = new System.Drawing.Size(466, 21);
 			this.comboBoxArticles.TabIndex = 8;
 			this.comboBoxArticles.SelectedIndexChanged += new System.EventHandler(this.comboBoxArticles_SelectedIndexChanged);
 			this.comboBoxArticles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.comboBoxArticles_MouseDown);
+			// 
+			// comboBoxNutzer
+			// 
+			this.comboBoxNutzer.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+			this.comboBoxNutzer.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+			this.comboBoxNutzer.FormattingEnabled = true;
+			this.comboBoxNutzer.Location = new System.Drawing.Point(685, 41);
+			this.comboBoxNutzer.Name = "comboBoxNutzer";
+			this.comboBoxNutzer.Size = new System.Drawing.Size(162, 21);
+			this.comboBoxNutzer.TabIndex = 9;
+			this.comboBoxNutzer.SelectedIndexChanged += new System.EventHandler(this.comboBoxNutzer_SelectedIndexChanged);
+			this.comboBoxNutzer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBoxNutzer_KeyDown);
+			this.comboBoxNutzer.MouseDown += new System.Windows.Forms.MouseEventHandler(this.comboBoxNutzer_MouseDown);
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(638, 44);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(41, 13);
+			this.label2.TabIndex = 10;
+			this.label2.Text = "Nutzer:";
+			// 
+			// textBoxSuche
+			// 
+			this.textBoxSuche.Location = new System.Drawing.Point(853, 41);
+			this.textBoxSuche.Name = "textBoxSuche";
+			this.textBoxSuche.Size = new System.Drawing.Size(179, 20);
+			this.textBoxSuche.TabIndex = 11;
+			// 
+			// buttonSuche
+			// 
+			this.buttonSuche.Location = new System.Drawing.Point(1038, 38);
+			this.buttonSuche.Name = "buttonSuche";
+			this.buttonSuche.Size = new System.Drawing.Size(71, 23);
+			this.buttonSuche.TabIndex = 12;
+			this.buttonSuche.Text = "such!";
+			this.buttonSuche.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			this.buttonSuche.UseVisualStyleBackColor = true;
+			this.buttonSuche.Click += new System.EventHandler(this.buttonSuche_Click);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1125, 737);
+			this.ClientSize = new System.Drawing.Size(1119, 737);
+			this.Controls.Add(this.buttonSuche);
+			this.Controls.Add(this.textBoxSuche);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.comboBoxNutzer);
 			this.Controls.Add(this.comboBoxArticles);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.richTextBox1);
 			this.Controls.Add(this.textBoxUrl);
 			this.Controls.Add(this.expandButton);
-			this.Controls.Add(this.exitButton);
 			this.Controls.Add(this.loadButton);
 			this.Controls.Add(this.treeView1);
 			this.KeyPreview = true;
@@ -163,12 +198,15 @@
 
 		private System.Windows.Forms.TreeView treeView1;
 		private System.Windows.Forms.Button loadButton;
-		private System.Windows.Forms.Button exitButton;
 		private System.Windows.Forms.Button expandButton;
 		private System.Windows.Forms.TextBox textBoxUrl;
 		private System.Windows.Forms.RichTextBox richTextBox1;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ComboBox comboBoxArticles;
+		private System.Windows.Forms.ComboBox comboBoxNutzer;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.TextBox textBoxSuche;
+		private System.Windows.Forms.Button buttonSuche;
 	}
 }
 
