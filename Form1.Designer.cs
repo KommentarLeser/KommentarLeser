@@ -154,6 +154,7 @@
 			this.textBoxSuche.Name = "textBoxSuche";
 			this.textBoxSuche.Size = new System.Drawing.Size(179, 20);
 			this.textBoxSuche.TabIndex = 11;
+			this.textBoxSuche.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxSuche_KeyPress);
 			// 
 			// buttonSuche
 			// 

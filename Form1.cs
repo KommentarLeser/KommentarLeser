@@ -268,6 +268,8 @@ namespace KommentarLeser
 						saveState(); // Altes seenSet/checkedSet abspeichern
 						treeView1.Nodes.Clear();
 					}
+					_userNames.Clear();
+					comboBoxNutzer.Items.Clear();
 					var div = doc?.QuerySelector(".entry-content");
 					if(div == null)
 						throw new Exception("Kann Artikel nicht finden.");
@@ -286,6 +288,7 @@ namespace KommentarLeser
 					loadCheckedSet();
 
 					_userNames.Clear();
+					_userNames.Add("-- kein --", new List<TreeNode>());
 					filltree(commentList, treeView1.Nodes[0].Nodes);
 					comboBoxNutzer.Items.Clear();
 					foreach(var nutzer in _userNames)
@@ -297,10 +300,11 @@ namespace KommentarLeser
 					{
 						//var temp = comboBoxNutzer.Items[idx];
 						//comboBoxNutzer.Items.RemoveAt(idx);
-						comboBoxNutzer.Items.Insert(0, "Russophilus");
+						comboBoxNutzer.Items.Insert(1, "Russophilus");
+#if false
 						comboBoxNutzer.SelectedIndex = 0;
+#endif
 					}
-
 					if(expanded)
 						expand();
 					else
@@ -575,7 +579,7 @@ namespace KommentarLeser
 			_lastSelectedUserList = _userNames[(string)comboBoxNutzer.SelectedItem];
 			foreach(TreeNode node in _lastSelectedUserList)
 			{
-				node.BackColor = Color.LightGray;
+				node.BackColor = Color.PeachPuff;
 			}
 		}
 
@@ -612,18 +616,40 @@ namespace KommentarLeser
 					node.NodeFont = regularFont;
 				return;
 			}
-			Font boldFont = new Font(nodeFont, FontStyle.Underline);
+			Font boldFont = new Font(nodeFont, FontStyle.Bold);
 			foreach(TreeNode node in enu)
 			{
 				var lowercase = ((entry)node.Tag).text.ToLower();
 				if(lowercase.Contains(suchtext))
+				{
 					node.NodeFont = boldFont;
+					node.Text = node.Text;
+				}
 				else
 					node.NodeFont = regularFont;
 			}
 		}
+
+		private void textBoxSuche_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			if(e.KeyChar == '\r')
+			{
+				e.Handled = true;
+				buttonSuche_Click(null, null);
+			}
+		}
 	}
-	
+
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+	//##############################################################################################
+
 	class Utilities
 	{
 		public static string sanitizeUrl(string inUrl)
