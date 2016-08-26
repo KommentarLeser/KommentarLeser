@@ -19,7 +19,7 @@ namespace KommentarLeser
 	public partial class Form1 : Form
 	{
 		private AngleSharp.Parser.Html.HtmlParser parser;
-		private string url;
+		private string _url;
 		private string html;
 		//private string urlFileName = "";
 		private string progOptionPath;
@@ -148,7 +148,7 @@ namespace KommentarLeser
 		}
 		private void setUrl(string inUrl)
 		{
-			url = Utilities.sanitizeUrl(inUrl);
+			_url = Utilities.sanitizeUrl(inUrl);
 		}
 		void restoreState()
 		{
@@ -163,7 +163,7 @@ namespace KommentarLeser
 		}
 		private void saveState()
 		{
-			string urlFileName = filenameFromUrl(url);
+			string urlFileName = filenameFromUrl(_url);
 			string saveFileName = progOptionPath + urlFileName;
 
 			System.IO.FileStream file = System.IO.File.Create(saveFileName);
@@ -202,7 +202,7 @@ namespace KommentarLeser
 		}
 		void loadSeenSet()
 		{
-			string urlFileName = filenameFromUrl(url);
+			string urlFileName = filenameFromUrl(_url);
 			string loadFile = progOptionPath + urlFileName;
 			string[] lines;
 			try
@@ -219,7 +219,7 @@ namespace KommentarLeser
 		}
 		void loadCheckedSet()
 		{
-			string urlFileName = filenameFromUrl(url);
+			string urlFileName = filenameFromUrl(_url);
 			string loadFile = progOptionPath + urlFileName + ".checked";
 			string[] lines;
 			try
@@ -237,60 +237,71 @@ namespace KommentarLeser
 
 		private void loadButton_Click(object sender, EventArgs e)
 		{
+			string oldUrl = _url;
+			string oldUser = (string)comboBoxNutzer.SelectedItem;
+			AngleSharp.Dom.IElement div;
 			try
 			{
 				enableAll(false);
 				UseWaitCursor = true;
+
+				if(treeView1.Nodes.Count != 0)
+				{
+					saveState(); // Altes seenSet/checkedSet abspeichern
+					treeView1.Nodes.Clear();
+				}
+				_userNames.Clear();
+				comboBoxNutzer.Items.Clear();
+				comboBoxNutzer.SelectedIndex = -1;
+				richTextBox1.Clear();
+				textBoxSuche.Clear();
 				Application.DoEvents();
+
 				setUrl(textBoxUrl.Text);
-				byte[] bytes = webClient.DownloadData(url);
+				byte[] bytes = webClient.DownloadData(_url);
 				html = System.Text.Encoding.UTF8.GetString(bytes);
 				doc = parser.Parse(html);
-				var div = doc?.QuerySelector(".social-comments");
+
+				div = doc?.QuerySelector(".entry-content"); // Artikel
+				if(div == null)
+					throw new Exception("Kann Artikel nicht finden.");
+
+				entry ent = new entry();
+				ent.name = "Artikel";
+				ent.id = "Artikel";
+				ent.when = "";
+				ent.link = _url;
+				ent.text = div.TextContent;
+				ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
+				TreeNode tn = new TreeNode(ent.name);
+				tn.Tag = ent;
+				treeView1.Nodes.Add(tn);
+
+				div = doc?.QuerySelector(".social-comments");
 				commentList = div?.QuerySelector(".social-commentlist");
 				if(commentList == null)
 					commentList = div?.QuerySelector(".commentlist");
-				if(commentList == null)
-					throw new Exception("list == null");
 			}
 			catch(Exception ex)
 			{
-				url = "";
+				_url = "";
 				commentList = null;
-				MessageBox.Show("Der Kommentarleser konnte die Adresse nicht interpretieren.");
+				treeView1.Nodes.Clear();
+			
+				_userNames.Clear();
+				comboBoxNutzer.Items.Clear();
+				comboBoxNutzer.SelectedIndex = -1;
+				MessageBox.Show("Kein Artikel gefunden.");
 			}
 			finally
 			{
-				if(commentList != null) // wir konnten parsen
+				if(commentList != null) // wir habenm Kommentare
 				{
-					if(treeView1.Nodes.Count != 0)
-					{
-						saveState(); // Altes seenSet/checkedSet abspeichern
-						treeView1.Nodes.Clear();
-					}
-					_userNames.Clear();
-					comboBoxNutzer.Items.Clear();
-					var div = doc?.QuerySelector(".entry-content");
-					if(div == null)
-						throw new Exception("Kann Artikel nicht finden.");
-					entry ent = new entry();
-					ent.name = "Artikel";
-					ent.id = "Artikel";
-					ent.when = "";
-					ent.link = url;
-					ent.text = div.TextContent;
-					ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
-					TreeNode tn = new TreeNode(ent.name);
-					tn.Tag = ent;
-					treeView1.Nodes.Add(tn);
-
 					loadSeenSet(); // Liste der bereits gesehenen IDs laden
-					loadCheckedSet();
+					loadCheckedSet(); // Liste der mrkierten IDs laden
 
-					_userNames.Clear();
 					_userNames.Add("-- kein --", new List<TreeNode>());
 					filltree(commentList, treeView1.Nodes[0].Nodes);
-					comboBoxNutzer.Items.Clear();
 					foreach(var nutzer in _userNames)
 					{
 						comboBoxNutzer.Items.Add(nutzer.Key);
@@ -298,12 +309,16 @@ namespace KommentarLeser
 					int idx = comboBoxNutzer.Items.IndexOf("Russophilus");
 					if(idx != -1)
 					{
-						//var temp = comboBoxNutzer.Items[idx];
-						//comboBoxNutzer.Items.RemoveAt(idx);
 						comboBoxNutzer.Items.Insert(1, "Russophilus");
 #if false
-						comboBoxNutzer.SelectedIndex = 0;
+						comboBoxNutzer.SelectedIndex = 1;
 #endif
+					}
+					if(oldUser != null)
+					{
+						int index = comboBoxNutzer.FindStringExact(oldUser);
+						if(index != -1)
+							comboBoxNutzer.SelectedIndex = index;
 					}
 					if(expanded)
 						expand();
@@ -317,10 +332,10 @@ namespace KommentarLeser
 						treeView1.SelectedNode = treeView1.Nodes?[0];
 					}
 					//expandButton.Select();
-					UseWaitCursor = false;
-					enableAll(true);
-					richTextBox1.Focus();
 				}
+				UseWaitCursor = false;
+				enableAll(true);
+				richTextBox1.Focus();
 			}
 		}
 		private void filltree(AngleSharp.Dom.IElement subList, TreeNodeCollection nodelist)
@@ -393,7 +408,7 @@ namespace KommentarLeser
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if(treeView1.Nodes.Count > 0 && url != "")
+			if(treeView1.Nodes.Count > 0 && _url != "")
 			{
 				saveState();
 			}
@@ -459,21 +474,21 @@ namespace KommentarLeser
 				using(System.IO.StreamReader urlsw = new System.IO.StreamReader(loadUrlFile))
 				{
 					setUrl(urlsw.ReadLine());
-					this.textBoxUrl.Text = url;
+					this.textBoxUrl.Text = _url;
 				}
 			}
 			catch(Exception ex)
 			{
-				url = "";
+				_url = "";
 				this.textBoxUrl.Text = "";
 			}
-			return url;
+			return _url;
 		}
 
 		void restoreUrl(Progress p)
 		{
 			p.Text = "Lade Artikel...";
-			if(url == "")
+			if(_url == "")
 			{
 				if(this.comboBoxArticles.Items.Count > 0)
 				{
@@ -484,7 +499,7 @@ namespace KommentarLeser
 			else
 			{
 				string temp = Properties.Settings.Default.lastComment;
-				comboBoxArticles.SelectedIndex = findInCombobox(url);
+				comboBoxArticles.SelectedIndex = findInCombobox(_url);
 				Properties.Settings.Default.lastComment = temp;
 			}
 		}

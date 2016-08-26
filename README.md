@@ -3,6 +3,7 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+v1.0.0.14 - Einige kleine Fehlerkorrekturen.  
 v1.0.0.13 - Suche nach Nutzer und nach Inhalten.  
 v1.0.0.12 - F5 lädt neu.  
 v1.0.0.11 - Bugfix: der letzte Kommentar wurde nicht wiederausgewählt.  
