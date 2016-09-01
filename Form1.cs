@@ -54,6 +54,11 @@ namespace KommentarLeser
 			_version = "v" + fileVersionInfo.ProductVersion;
 			Text = "KommentarLeser - " + _version;
 			_userNames = new SortedDictionary<string, List<TreeNode>>();
+			if(Properties.Settings.Default.size.Height != -1)
+			{
+				Location = Properties.Settings.Default.location;
+				Size = Properties.Settings.Default.size;
+			}
 			enableAll(false);
 		}
 
@@ -408,6 +413,9 @@ namespace KommentarLeser
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			
+			Properties.Settings.Default.location = Location;
+			Properties.Settings.Default.size = Size;
 			if(treeView1.Nodes.Count > 0 && _url != "")
 			{
 				saveState();

@@ -58,5 +58,29 @@ namespace KommentarLeser.Properties {
                 this["expanded"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1, -1")]
+        public global::System.Drawing.Point location {
+            get {
+                return ((global::System.Drawing.Point)(this["location"]));
+            }
+            set {
+                this["location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1, -1")]
+        public global::System.Drawing.Size size {
+            get {
+                return ((global::System.Drawing.Size)(this["size"]));
+            }
+            set {
+                this["size"] = value;
+            }
+        }
     }
 }
