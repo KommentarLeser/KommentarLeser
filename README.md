@@ -3,6 +3,7 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+v1.0.0.16 - Läuft auf neuer Saker-Seite, verbesserte Nutzersuche, Korrektur Nutzerliste.  
 v1.0.0.15 - Fensterposition wird gespeichert/wiederhergestellt.  
 v1.0.0.14 - Einige kleine Fehlerkorrekturen.  
 v1.0.0.13 - Suche nach Nutzer und nach Inhalten.  
@@ -18,7 +19,5 @@ v1.0.0.4 - Doppelklick auf Knoten öffnet Kommentar im Browser.
 
 ---
 
-![](http://www2.pic-upload.de/img/31448544/KL.png)
+![](http://www.pic-upload.de/view-31957477/Screen-1.0.0.16.png.html)
 
-<!-- <img src="http://www2.pic-upload.de/img/31350995/KL.png" height="665" width="1064"></img> 
--->

@@ -33,9 +33,16 @@ namespace KommentarLeser
 		private string selectedCommentId = "";
 		private System.Net.WebClient webClient = new System.Net.WebClient();
 
+		private Font regularFont;
+		private Font boldFont;
+		private Font underlineFont;
+
 		public Form1()
 		{
 			InitializeComponent();
+			regularFont = treeView1.Font;
+			boldFont = new Font(regularFont, FontStyle.Bold);
+			underlineFont = new Font(regularFont, FontStyle.Underline);
 			parser = new AngleSharp.Parser.Html.HtmlParser();
 #if DEBUG
 			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/die-spaltung-der-linken-ganz-im-sinne-der-herrschenden/";
@@ -76,9 +83,9 @@ namespace KommentarLeser
 
 		private void readArticleList(Progress p)
 		{
+			string num = "1";
 			try
 			{
-				string num = "1";
 				string mainUrl = "http://vineyardsaker.de";
 				for(int i = 0; i < 5; ++i)
 				{
@@ -97,13 +104,16 @@ namespace KommentarLeser
 					num = (i + 2).ToString();
 					mainUrl = "http://vineyardsaker.de/page/" + num;
 #if DEBUG
-					break;
+					break; // im DEBUG-Modus nur eine Seite Laden
 #endif
 				}
 			}
 			catch(Exception ex)
 			{
-				MessageBox.Show("Fehler beim Lesen der Artikelliste\n" + ex.ToString());
+				int nnum;
+				int.TryParse(num, out nnum);
+				if(nnum == 1)
+					MessageBox.Show("Fehler beim Lesen der Artikelliste\n" + ex.ToString());
 			}
 			p.set("");
 		}
@@ -282,8 +292,10 @@ namespace KommentarLeser
 				tn.Tag = ent;
 				treeView1.Nodes.Add(tn);
 
-				div = doc?.QuerySelector(".social-comments");
-				commentList = div?.QuerySelector(".social-commentlist");
+				//div = doc?.QuerySelector(".social-comments");
+				div = doc?.QuerySelector(".comments-area");
+				//commentList = div?.QuerySelector(".social-commentlist");
+				commentList = div?.QuerySelector(".comment-list");
 				if(commentList == null)
 					commentList = div?.QuerySelector(".commentlist");
 			}
@@ -307,6 +319,7 @@ namespace KommentarLeser
 
 					_userNames.Add("-- kein --", new List<TreeNode>());
 					filltree(commentList, treeView1.Nodes[0].Nodes);
+					comboBoxNutzer.Items.Clear();
 					foreach(var nutzer in _userNames)
 					{
 						comboBoxNutzer.Items.Add(nutzer.Key);
@@ -349,11 +362,16 @@ namespace KommentarLeser
 			foreach(var item in items)
 			{
 				entry ent = new entry();
-				ent.name = item.QuerySelector("cite.fn").TextContent;
-				ent.id = item.QuerySelector(".social-comment-inner").Id;
-				ent.when = item.QuerySelector(".social-posted-when").TextContent;
-				ent.link = item.QuerySelector(".social-posted-when").GetAttribute("href");
-				ent.text = item.QuerySelector(".social-comment-body").TextContent;
+				//ent.name = item.QuerySelector("cite.fn").TextContent;
+				ent.name = item.QuerySelector(".fn").TextContent;
+				//ent.id = item.QuerySelector(".social-comment-inner").Id;
+				ent.id = item.QuerySelector(".comment-body").Id;
+				//ent.when = item.QuerySelector(".social-posted-when").TextContent;
+				ent.when = item.QuerySelector(".comment-metadata time").TextContent;
+				//ent.link = item.QuerySelector(".social-posted-when").GetAttribute("href");
+				ent.link = item.QuerySelector(".comment-metadata a").GetAttribute("href");
+				//ent.text = item.QuerySelector(".social-comment-body").TextContent;
+				ent.text = item.QuerySelector(".comment-content").TextContent;
 				ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
 				TreeNode tn = new TreeNode(ent.name + "  -  " + ent.when);
 				tn.Tag = ent;
@@ -366,7 +384,7 @@ namespace KommentarLeser
 				if(!_userNames.ContainsKey(ent.name))
 					_userNames.Add(ent.name, new System.Collections.Generic.List<TreeNode>());
 				_userNames[ent.name].Add(tn);
-				var sublist = item.QuerySelector("ul"); // Unterliste?
+				var sublist = item.QuerySelector("ol"); // Unterliste?
 				if(sublist != null)
 					filltree(sublist, tn.Nodes);
 			}
@@ -424,6 +442,7 @@ namespace KommentarLeser
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
+			treeView1.SelectedNode.NodeFont = regularFont;
 			updateText();
 			selectedCommentId = ((entry)treeView1.SelectedNode.Tag).id;
 			Properties.Settings.Default.lastComment = selectedCommentId;
@@ -450,8 +469,8 @@ namespace KommentarLeser
 				p.StartPosition = FormStartPosition.Manual;
 				Point pos = new Point((Width / 2) + Left - (p.Width / 2), ((Height) / 2) + Top - p.Height / 2);
 				p.Location = pos;
-				p.Show(this);
 				p.Text = "Lade Artikelliste...";
+				p.Show(this);
 				restoreArticleList(p);
 				restoreUrl(p);
 				restoreState();
@@ -598,11 +617,16 @@ namespace KommentarLeser
 		private void comboBoxNutzer_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			foreach(TreeNode node in _lastSelectedUserList)
+			{
 				node.BackColor = treeView1.BackColor;
+				node.NodeFont = regularFont;
+			}
 			_lastSelectedUserList = _userNames[(string)comboBoxNutzer.SelectedItem];
 			foreach(TreeNode node in _lastSelectedUserList)
 			{
 				node.BackColor = Color.PeachPuff;
+				if(!((entry)node.Tag).seen)
+					node.NodeFont = underlineFont;
 			}
 		}
 
@@ -630,8 +654,8 @@ namespace KommentarLeser
 				return;
 			TVEnumerable enu = new TVEnumerable(treeView1.Nodes[0].Nodes);
 			//var nodeFont = treeView1.Nodes[0].NodeFont;
-			var nodeFont = treeView1.Font;
-			Font regularFont = new Font(nodeFont, FontStyle.Regular);
+			//var nodeFont = treeView1.Font;
+			//Font regularFont = new Font(nodeFont, FontStyle.Regular);
 
 			if(textBoxSuche.Text == "")
 			{
@@ -639,7 +663,7 @@ namespace KommentarLeser
 					node.NodeFont = regularFont;
 				return;
 			}
-			Font boldFont = new Font(nodeFont, FontStyle.Bold);
+			//Font boldFont = new Font(nodeFont, FontStyle.Bold);
 			foreach(TreeNode node in enu)
 			{
 				var lowercase = ((entry)node.Tag).text.ToLower();
