@@ -19,5 +19,5 @@ v1.0.0.4 - Doppelklick auf Knoten öffnet Kommentar im Browser.
 
 ---
 
-![](http://www.pic-upload.de/view-31957477/Screen-1.0.0.16.png.html)
+![](http://www2.pic-upload.de/img/31957477/Screen-1.0.0.16.png)
 
