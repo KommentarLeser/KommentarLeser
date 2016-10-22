@@ -363,7 +363,10 @@ namespace KommentarLeser
 			{
 				entry ent = new entry();
 				//ent.name = item.QuerySelector("cite.fn").TextContent;
-				ent.name = item.QuerySelector(".fn").TextContent;
+				var fn = item.QuerySelector(".fn");
+				if(fn == null)
+					continue;
+				ent.name = fn.TextContent;
 				//ent.id = item.QuerySelector(".social-comment-inner").Id;
 				ent.id = item.QuerySelector(".comment-body").Id;
 				//ent.when = item.QuerySelector(".social-posted-when").TextContent;

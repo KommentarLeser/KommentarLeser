@@ -3,6 +3,7 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+v1.0.0.17 - Fehlerkorrektur Absturz.  
 v1.0.0.16 - Läuft auf neuer Saker-Seite, verbesserte Nutzersuche, Korrektur Nutzerliste.  
 v1.0.0.15 - Fensterposition wird gespeichert/wiederhergestellt.  
 v1.0.0.14 - Einige kleine Fehlerkorrekturen.  
