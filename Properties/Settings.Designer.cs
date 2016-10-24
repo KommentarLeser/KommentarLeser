@@ -82,5 +82,17 @@ namespace KommentarLeser.Properties {
                 this["size"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("449")]
+        public int splitterDistance {
+            get {
+                return ((int)(this["splitterDistance"]));
+            }
+            set {
+                this["splitterDistance"] = value;
+            }
+        }
     }
 }

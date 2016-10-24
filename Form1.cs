@@ -65,6 +65,7 @@ namespace KommentarLeser
 			{
 				Location = Properties.Settings.Default.location;
 				Size = Properties.Settings.Default.size;
+				splitContainer1.SplitterDistance = Properties.Settings.Default.splitterDistance;
 			}
 			enableAll(false);
 		}
@@ -254,6 +255,7 @@ namespace KommentarLeser
 		{
 			string oldUrl = _url;
 			string oldUser = (string)comboBoxNutzer.SelectedItem;
+			comboBoxNutzer.Text = "";
 			AngleSharp.Dom.IElement div;
 			try
 			{
@@ -339,6 +341,8 @@ namespace KommentarLeser
 						int index = comboBoxNutzer.FindStringExact(oldUser);
 						if(index != -1)
 							comboBoxNutzer.SelectedIndex = index;
+						else
+							comboBoxNutzer.SelectedIndex = -1;
 					}
 					if(expanded)
 						expand();
@@ -436,9 +440,9 @@ namespace KommentarLeser
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			
 			Properties.Settings.Default.location = Location;
 			Properties.Settings.Default.size = Size;
+			Properties.Settings.Default.splitterDistance = splitContainer1.SplitterDistance;
 			if(treeView1.Nodes.Count > 0 && _url != "")
 			{
 				saveState();

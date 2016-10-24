@@ -39,17 +39,21 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.textBoxSuche = new System.Windows.Forms.TextBox();
 			this.buttonSuche = new System.Windows.Forms.Button();
+			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+			this.splitContainer1.Panel1.SuspendLayout();
+			this.splitContainer1.Panel2.SuspendLayout();
+			this.splitContainer1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// treeView1
 			// 
-			this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
 			this.treeView1.CheckBoxes = true;
+			this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.treeView1.HideSelection = false;
-			this.treeView1.Location = new System.Drawing.Point(12, 70);
+			this.treeView1.Location = new System.Drawing.Point(0, 0);
 			this.treeView1.Name = "treeView1";
-			this.treeView1.Size = new System.Drawing.Size(460, 655);
+			this.treeView1.Size = new System.Drawing.Size(449, 655);
 			this.treeView1.TabIndex = 2;
 			this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -91,17 +95,15 @@
 			// 
 			// richTextBox1
 			// 
-			this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.richTextBox1.BackColor = System.Drawing.Color.Gainsboro;
 			this.richTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.richTextBox1.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.richTextBox1.Location = new System.Drawing.Point(478, 70);
+			this.richTextBox1.Location = new System.Drawing.Point(0, 0);
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.richTextBox1.Size = new System.Drawing.Size(629, 655);
+			this.richTextBox1.Size = new System.Drawing.Size(645, 655);
 			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -173,22 +175,40 @@
 			this.buttonSuche.UseVisualStyleBackColor = true;
 			this.buttonSuche.Click += new System.EventHandler(this.buttonSuche_Click);
 			// 
+			// splitContainer1
+			// 
+			this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.splitContainer1.Location = new System.Drawing.Point(9, 70);
+			this.splitContainer1.Name = "splitContainer1";
+			// 
+			// splitContainer1.Panel1
+			// 
+			this.splitContainer1.Panel1.Controls.Add(this.treeView1);
+			// 
+			// splitContainer1.Panel2
+			// 
+			this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
+			this.splitContainer1.Size = new System.Drawing.Size(1098, 655);
+			this.splitContainer1.SplitterDistance = 449;
+			this.splitContainer1.TabIndex = 13;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1119, 737);
+			this.Controls.Add(this.splitContainer1);
 			this.Controls.Add(this.buttonSuche);
 			this.Controls.Add(this.textBoxSuche);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.comboBoxNutzer);
 			this.Controls.Add(this.comboBoxArticles);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.richTextBox1);
 			this.Controls.Add(this.textBoxUrl);
 			this.Controls.Add(this.expandButton);
 			this.Controls.Add(this.loadButton);
-			this.Controls.Add(this.treeView1);
 			this.KeyPreview = true;
 			this.Name = "Form1";
 			this.Text = "Sakers Kommentarleser";
@@ -196,6 +216,10 @@
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.Shown += new System.EventHandler(this.Form1_Shown);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+			this.splitContainer1.Panel1.ResumeLayout(false);
+			this.splitContainer1.Panel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+			this.splitContainer1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -214,6 +238,7 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textBoxSuche;
 		private System.Windows.Forms.Button buttonSuche;
+		private System.Windows.Forms.SplitContainer splitContainer1;
 	}
 }
 
