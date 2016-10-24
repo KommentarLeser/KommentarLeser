@@ -318,7 +318,9 @@ namespace KommentarLeser
 					loadCheckedSet(); // Liste der mrkierten IDs laden
 
 					_userNames.Add("-- kein --", new List<TreeNode>());
+					treeView1.BeginUpdate();
 					filltree(commentList, treeView1.Nodes[0].Nodes);
+					treeView1.EndUpdate();
 					comboBoxNutzer.Items.Clear();
 					foreach(var nutzer in _userNames)
 					{
@@ -368,9 +370,9 @@ namespace KommentarLeser
 					continue;
 				ent.name = fn.TextContent;
 				//ent.id = item.QuerySelector(".social-comment-inner").Id;
-				ent.id = item.QuerySelector(".comment-body").Id;
+				ent.id = item.QuerySelector(".comment-body").Id;//.Trim();
 				//ent.when = item.QuerySelector(".social-posted-when").TextContent;
-				ent.when = item.QuerySelector(".comment-metadata time").TextContent;
+				ent.when = item.QuerySelector(".comment-metadata time").TextContent.Trim();
 				//ent.link = item.QuerySelector(".social-posted-when").GetAttribute("href");
 				ent.link = item.QuerySelector(".comment-metadata a").GetAttribute("href");
 				//ent.text = item.QuerySelector(".social-comment-body").TextContent;

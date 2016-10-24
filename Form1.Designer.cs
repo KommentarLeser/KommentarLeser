@@ -49,7 +49,7 @@
 			this.treeView1.HideSelection = false;
 			this.treeView1.Location = new System.Drawing.Point(12, 70);
 			this.treeView1.Name = "treeView1";
-			this.treeView1.Size = new System.Drawing.Size(372, 655);
+			this.treeView1.Size = new System.Drawing.Size(460, 655);
 			this.treeView1.TabIndex = 2;
 			this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -97,11 +97,11 @@
 			this.richTextBox1.BackColor = System.Drawing.Color.Gainsboro;
 			this.richTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.richTextBox1.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.richTextBox1.Location = new System.Drawing.Point(390, 70);
+			this.richTextBox1.Location = new System.Drawing.Point(478, 70);
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.richTextBox1.Size = new System.Drawing.Size(717, 655);
+			this.richTextBox1.Size = new System.Drawing.Size(629, 655);
 			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -118,6 +118,8 @@
 			// 
 			// comboBoxArticles
 			// 
+			this.comboBoxArticles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboBoxArticles.FormattingEnabled = true;
 			this.comboBoxArticles.Location = new System.Drawing.Point(166, 41);
 			this.comboBoxArticles.Name = "comboBoxArticles";
@@ -128,6 +130,7 @@
 			// 
 			// comboBoxNutzer
 			// 
+			this.comboBoxNutzer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboBoxNutzer.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
 			this.comboBoxNutzer.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
 			this.comboBoxNutzer.FormattingEnabled = true;
@@ -141,6 +144,7 @@
 			// 
 			// label2
 			// 
+			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label2.AutoSize = true;
 			this.label2.Location = new System.Drawing.Point(638, 44);
 			this.label2.Name = "label2";
@@ -150,6 +154,7 @@
 			// 
 			// textBoxSuche
 			// 
+			this.textBoxSuche.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBoxSuche.Location = new System.Drawing.Point(853, 41);
 			this.textBoxSuche.Name = "textBoxSuche";
 			this.textBoxSuche.Size = new System.Drawing.Size(179, 20);
@@ -158,6 +163,7 @@
 			// 
 			// buttonSuche
 			// 
+			this.buttonSuche.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.buttonSuche.Location = new System.Drawing.Point(1038, 38);
 			this.buttonSuche.Name = "buttonSuche";
 			this.buttonSuche.Size = new System.Drawing.Size(71, 23);
