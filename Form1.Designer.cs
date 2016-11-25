@@ -40,6 +40,8 @@
 			this.textBoxSuche = new System.Windows.Forms.TextBox();
 			this.buttonSuche = new System.Windows.Forms.Button();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.listView1 = new System.Windows.Forms.ListView();
+			this.column1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -189,10 +191,34 @@
 			// 
 			// splitContainer1.Panel2
 			// 
+			this.splitContainer1.Panel2.Controls.Add(this.listView1);
 			this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
 			this.splitContainer1.Size = new System.Drawing.Size(1098, 655);
 			this.splitContainer1.SplitterDistance = 449;
 			this.splitContainer1.TabIndex = 13;
+			// 
+			// listView1
+			// 
+			this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.listView1.AutoArrange = false;
+			this.listView1.CheckBoxes = true;
+			this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.column1});
+			this.listView1.HideSelection = false;
+			this.listView1.Location = new System.Drawing.Point(4, 337);
+			this.listView1.MultiSelect = false;
+			this.listView1.Name = "listView1";
+			this.listView1.Size = new System.Drawing.Size(638, 318);
+			this.listView1.TabIndex = 5;
+			this.listView1.UseCompatibleStateImageBehavior = false;
+			this.listView1.View = System.Windows.Forms.View.Details;
+			this.listView1.MouseEnter += new System.EventHandler(this.listView1_MouseEnter);
+			// 
+			// column1
+			// 
+			this.column1.Text = "";
+			this.column1.Width = 600;
 			// 
 			// Form1
 			// 
@@ -239,6 +265,8 @@
 		private System.Windows.Forms.TextBox textBoxSuche;
 		private System.Windows.Forms.Button buttonSuche;
 		private System.Windows.Forms.SplitContainer splitContainer1;
+		private System.Windows.Forms.ListView listView1;
+		private System.Windows.Forms.ColumnHeader column1;
 	}
 }
 
