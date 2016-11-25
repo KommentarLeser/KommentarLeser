@@ -41,13 +41,18 @@ namespace KommentarLeser
 		private Font regularFont;
 		private Font boldFont;
 		private Font underlineFont;
+		private Font underlineBoldFont;
 
 		public Form1()
 		{
 			InitializeComponent();
 			regularFont = treeView1.Font;
 			boldFont = new Font(regularFont, FontStyle.Bold);
-			underlineFont = new Font(regularFont, FontStyle.Underline);
+			// underline aus Ästhetischen Gründen raus
+			//underlineFont = new Font(regularFont, FontStyle.Underline);
+			underlineFont = regularFont;
+			underlineBoldFont = new Font(regularFont, FontStyle.Underline | FontStyle.Bold);
+
 			parser = new AngleSharp.Parser.Html.HtmlParser();
 #if DEBUG
 			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/die-spaltung-der-linken-ganz-im-sinne-der-herrschenden/";
@@ -161,6 +166,8 @@ namespace KommentarLeser
 			public string link;
 			public string text;
 			public bool seen = false;
+			public bool isInSearch = false;
+			public bool isUserSelected = false;
 			public TreeNode tn;
 			public ListViewItem lvi;
 			public override string ToString()
@@ -223,30 +230,37 @@ namespace KommentarLeser
 			Properties.Settings.Default.expanded = expanded;
 			Properties.Settings.Default.Save();
 		}
-		void treeUpdateText()
+		void updateText(entry ent)
 		{
-			TreeNode tn = treeView1.SelectedNode;
-			entry ent = (entry)tn?.Tag;
 			if(ent != null)
 			{
 				richTextBox1.Clear();
 				richTextBox1.Text = ent.text;
-				if(!ent.seen)
-					markTreeNode(tn, null);
+				markEntryAsSeen(ent, true);
 			}
 		}
-		void listUpdateText()
-		{
-			ListViewItem lvi = listView1.SelectedItems[0];// .SelectedItem;
-			entry ent = (entry)lvi?.Tag;
-			if(ent != null)
-			{
-				richTextBox1.Clear();
-				richTextBox1.Text = ent.text;
-				if(!ent.seen)
-					markTreeNode(null, lvi);
-			}
-		}
+// 		void treeUpdateText()
+// 		{
+// 			TreeNode tn = treeView1.SelectedNode;
+// 			entry ent = (entry)tn?.Tag;
+// 			if(ent != null)
+// 			{
+// 				richTextBox1.Clear();
+// 				richTextBox1.Text = ent.text;
+// 				markEntryAsSeen(ent);
+// 			}
+// 		}
+// 		void listUpdateText()
+// 		{
+// 			ListViewItem lvi = listView1.SelectedItems[0];// .SelectedItem;
+// 			entry ent = (entry)lvi?.Tag;
+// 			if(ent != null)
+// 			{
+// 				richTextBox1.Clear();
+// 				richTextBox1.Text = ent.text;
+// 				markEntryAsSeen(ent);
+// 			}
+// 		}
 		void loadSeenSet()
 		{
 			string urlFileName = filenameFromUrl(_url);
@@ -326,6 +340,8 @@ namespace KommentarLeser
 				ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
 				TreeNode tn = new TreeNode(ent.name);
 				tn.Tag = ent;
+				ent.tn = tn;
+				ent.lvi = new ListViewItem(""); // Dummy!
 				treeView1.Nodes.Add(tn);
 
 				//div = doc?.QuerySelector(".social-comments");
@@ -366,13 +382,11 @@ namespace KommentarLeser
 					foreach(var entry in entryList)
 					{
 						listView1.Items.Add(entry.lvi);
-						//string deb = entry.lvi.Text;
 						float width = g.MeasureString(entry.lvi.Text, entry.lvi.Font).Width;
 						if(size.Width < width)
 							size.Width = width;
 					}
 					listView1.Columns[0].Width = (int)size.Width;
-					//listView1.Items.AddRange(entryList.ToArray());
 					treeView1.EndUpdate();
 					listView1.EndUpdate();
 					comboBoxNutzer.Items.Clear();
@@ -438,15 +452,15 @@ namespace KommentarLeser
 				ListViewItem lvi = new ListViewItem(eintrag);
 				lvi.Tag = ent;
 				lvi.Name = ent.id;
+				ent.tn = tn;
+				ent.lvi = lvi;
 				if(seenSet.Contains(ent.id))
-					markTreeNode(tn, lvi);
+					markEntryAsSeen(ent, true);
 				if(checkedSet.Contains(ent.id))
 				{
 					tn.Checked = true;
 					lvi.Checked = true;
 				}
-				ent.tn = tn;
-				ent.lvi = lvi;
 				nodelist.Add(tn);
 				entryList.Add(ent);
 				_id2entry.Add(ent.id, ent); // TODO: muß ich hier auf Duplikate achten? Eigentlich sollte das nicht vorkommen.
@@ -459,24 +473,84 @@ namespace KommentarLeser
 			}
 		}
 
-		private void markTreeNode(TreeNode tn, ListViewItem lvi)
+		private void markEntryAsSeen(entry ent, bool mark)
 		{
-			if(tn != null)
+			if(ent.seen == mark)
+				return;
+			ent.seen = mark;
+			if(mark)
 			{
-				entry ent = (entry)tn.Tag;
-				ent.seen = true;
-				tn.ForeColor = Color.Red;
-				seenSet.Add(ent.id);
+				ent.tn.ForeColor = Color.Red;
+				ent.lvi.ForeColor = Color.Red;
 			}
-			if(lvi != null)
+			else
 			{
-				entry ent = (entry)lvi.Tag;
-				ent.seen = true;
-				lvi.ForeColor = Color.Red;
-				seenSet.Add(ent.id);
+				ent.tn.ForeColor = Color.Black;
+				ent.lvi.ForeColor = Color.Black;
+			}
+			setFont(ent);
+		}
+		void markEntryAsInSearch(entry ent, bool mark)
+		{
+			if(ent.isInSearch == mark)
+				return;
+			ent.isInSearch = mark;
+			setFont(ent);
+		}
+		void markEntryAsUserSelected(entry ent, bool mark)
+		{
+			if(ent.isUserSelected == mark)
+				return;
+			ent.isUserSelected = mark;
+			if(mark)
+			{
+				ent.tn.BackColor = Color.PeachPuff;
+				ent.lvi.BackColor = Color.PeachPuff;
+			}
+			else
+			{
+				ent.tn.BackColor = treeView1.BackColor;
+				ent.lvi.BackColor = listView1.BackColor;
+			}
+			setFont(ent);
+		}
+		void setFont(entry ent)
+		{
+			if(ent.seen)
+			{
+				if(ent.isInSearch)
+				{
+					ent.tn.NodeFont = boldFont;
+					ent.lvi.Font = boldFont;
+				}
+				else
+				{
+					ent.tn.NodeFont = regularFont;
+					ent.lvi.Font = regularFont;
+				}
+			}
+			else // nicht gesehen
+			{
+				if(ent.isInSearch)
+				{
+					ent.tn.NodeFont = boldFont;
+					ent.lvi.Font = boldFont;
+				}
+				else // nicht gesehen und nicht in Suche
+				{
+					if(ent.isUserSelected)
+					{
+						ent.tn.NodeFont = underlineFont;
+						ent.lvi.Font = underlineFont;
+					}
+					else
+					{
+						ent.tn.NodeFont = regularFont;
+						ent.lvi.Font = regularFont;
+					}
+				}
 			}
 		}
-
 		private void expandButton_Click(object sender, EventArgs e)
 		{
 			if(expanded)
@@ -522,8 +596,8 @@ namespace KommentarLeser
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
 			var node = treeView1.SelectedNode;
-			node.NodeFont = regularFont;
-			treeUpdateText();
+			//node.NodeFont = regularFont;
+			updateText((entry)node.Tag);
 			selectedCommentId = ((entry)node.Tag).id;
 			Properties.Settings.Default.lastComment = selectedCommentId;
 			Properties.Settings.Default.Save();
@@ -532,45 +606,17 @@ namespace KommentarLeser
 				return;
 			ent.lvi.EnsureVisible();
 			ent.lvi.Selected = true;
-//			int count = -1;
-// 			foreach(ListViewItem vi in listView1.Items)
-// 			{
-// 				++count;
-// 				if(vi.Name == selectedCommentId)
-// 					break;
-// 			}
-// 			if(count < listView1.Items.Count)
-// 			{
-// 				//listView1.Select();
-// 				listView1.Items[count].EnsureVisible();// = true;
-// 				listView1.Items[count].Selected = true;
-// 			}
 		}
 		private void listView1_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if(listView1.SelectedItems.Count == 0)
 				return;
 			var lvi = listView1.SelectedItems[0];
-			lvi.Font = regularFont;
-			listUpdateText();
+			updateText((entry)lvi.Tag);
 			selectedCommentId = ((entry)lvi.Tag).id;
 			Properties.Settings.Default.lastComment = selectedCommentId;
 			Properties.Settings.Default.Save();
 			treeView1.SelectedNode = ((entry)lvi.Tag).tn;
-			
-			// 			int count = -1;
-			// 			foreach(ListViewItem vi in listView1.Items)
-			// 			{
-			// 				++count;
-			// 				if(vi.Name == selectedCommentId)
-			// 					break;
-			// 			}
-			// 			if(count < listView1.Items.Count)
-			// 			{
-			// 				//listView1.Select();
-			// 				listView1.Items[count].EnsureVisible();// = true;
-			// 				listView1.Items[count].Selected = true;
-			// 			}
 		}
 		private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
 		{
@@ -662,7 +708,9 @@ namespace KommentarLeser
 			expanded = false;
 			treeView1.CollapseAll();
 			expandButton.Text = "alles aufklappen";
-			treeUpdateText(); // beim Zuklappen wechselt u.U. der Node
+			if(treeView1.SelectedNode != null)
+				updateText((entry)treeView1.SelectedNode.Tag);
+			//treeUpdateText(); // beim Zuklappen wechselt u.U. der Node
 		}
 		
 		TreeNode findNodeById(ref string id, TreeNodeCollection nodes)
@@ -766,21 +814,23 @@ namespace KommentarLeser
 		{
 			foreach(entry ent in _lastSelectedUserList)
 			{
-				ent.tn.BackColor = treeView1.BackColor;
-				ent.tn.NodeFont = regularFont;
-				ent.lvi.BackColor = listView1.BackColor;
-				ent.lvi.Font = regularFont;
+				markEntryAsUserSelected(ent, false);
+// 				ent.tn.BackColor = treeView1.BackColor;
+// 				ent.tn.NodeFont = regularFont;
+// 				ent.lvi.BackColor = listView1.BackColor;
+// 				ent.lvi.Font = regularFont;
 			}
 			_lastSelectedUserList = _userNames[(string)comboBoxNutzer.SelectedItem];
 			foreach(entry ent in _lastSelectedUserList)
 			{
-				ent.tn.BackColor = Color.PeachPuff;
-				ent.lvi.BackColor = Color.PeachPuff;
-				if(!ent.seen)
-				{
-					ent.tn.NodeFont = underlineFont;
-					ent.lvi.Font = underlineFont;
-				}
+				markEntryAsUserSelected(ent, true);
+// 				ent.tn.BackColor = Color.PeachPuff;
+// 				ent.lvi.BackColor = Color.PeachPuff;
+// 				if(!ent.seen)
+// 				{
+// 					ent.tn.NodeFont = underlineFont;
+// 					ent.lvi.Font = underlineFont;
+// 				}
 			}
 		}
 
@@ -806,28 +856,26 @@ namespace KommentarLeser
 			string suchtext = textBoxSuche.Text.ToLower();
 			if(treeView1.Nodes.Count == 0)
 				return;
-			TVEnumerable enu = new TVEnumerable(treeView1.Nodes[0].Nodes);
-			//var nodeFont = treeView1.Nodes[0].NodeFont;
-			//var nodeFont = treeView1.Font;
-			//Font regularFont = new Font(nodeFont, FontStyle.Regular);
-
+			
 			if(textBoxSuche.Text == "")
 			{
-				foreach(TreeNode node in enu)
-					node.NodeFont = regularFont;
+				foreach(entry ent in entryList)
+				{
+					markEntryAsInSearch(ent, false);
+				}
 				return;
 			}
-			//Font boldFont = new Font(nodeFont, FontStyle.Bold);
-			foreach(TreeNode node in enu)
+			foreach(entry ent in entryList)
 			{
-				var lowercase = ((entry)node.Tag).text.ToLower();
+				var lowercase = ent.text.ToLower();
 				if(lowercase.Contains(suchtext))
 				{
-					node.NodeFont = boldFont;
-					//node.Text = node.Text;
+					markEntryAsInSearch(ent, true);
 				}
 				else
-					node.NodeFont = regularFont;
+				{
+					markEntryAsInSearch(ent, false);
+				}
 			}
 		}
 
