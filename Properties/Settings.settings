@@ -20,5 +20,8 @@
     <Setting Name="splitterDistance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">449</Value>
     </Setting>
+    <Setting Name="treeSplitterDistance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

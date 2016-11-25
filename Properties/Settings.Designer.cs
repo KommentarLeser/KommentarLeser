@@ -94,5 +94,17 @@ namespace KommentarLeser.Properties {
                 this["splitterDistance"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int treeSplitterDistance {
+            get {
+                return ((int)(this["treeSplitterDistance"]));
+            }
+            set {
+                this["treeSplitterDistance"] = value;
+            }
+        }
     }
 }

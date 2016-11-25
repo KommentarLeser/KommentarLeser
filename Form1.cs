@@ -78,6 +78,14 @@ namespace KommentarLeser
 				Size = Properties.Settings.Default.size;
 				splitContainer1.SplitterDistance = Properties.Settings.Default.splitterDistance;
 			}
+			if(Properties.Settings.Default.treeSplitterDistance != -1)
+			{
+				splitContainer2.SplitterDistance = Properties.Settings.Default.treeSplitterDistance;
+			}
+			else
+			{
+				splitContainer2.SplitterDistance = splitContainer2.Height / 3 * 2;
+			}
 			enableAll(false);
 		}
 
@@ -587,6 +595,7 @@ namespace KommentarLeser
 			Properties.Settings.Default.location = Location;
 			Properties.Settings.Default.size = Size;
 			Properties.Settings.Default.splitterDistance = splitContainer1.SplitterDistance;
+			Properties.Settings.Default.treeSplitterDistance = splitContainer2.SplitterDistance;
 			if(treeView1.Nodes.Count > 0 && _url != "")
 			{
 				saveState();
@@ -604,7 +613,7 @@ namespace KommentarLeser
 			var ent = (entry)node.Tag;
 			if(ent.lvi == null)
 				return;
-			ent.lvi.EnsureVisible();
+			//ent.lvi.EnsureVisible();
 			ent.lvi.Selected = true;
 		}
 		private void listView1_SelectedIndexChanged(object sender, EventArgs e)
