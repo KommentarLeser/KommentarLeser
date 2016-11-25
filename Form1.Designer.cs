@@ -205,6 +205,7 @@
 			this.listView1.CheckBoxes = true;
 			this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.column1});
+			this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.listView1.HideSelection = false;
 			this.listView1.Location = new System.Drawing.Point(4, 337);
 			this.listView1.MultiSelect = false;
@@ -213,12 +214,15 @@
 			this.listView1.TabIndex = 5;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
+			this.listView1.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.listView1_ItemChecked);
+			this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
+			this.listView1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDoubleClick);
 			this.listView1.MouseEnter += new System.EventHandler(this.listView1_MouseEnter);
 			// 
 			// column1
 			// 
 			this.column1.Text = "";
-			this.column1.Width = 600;
+			this.column1.Width = 1000;
 			// 
 			// Form1
 			// 

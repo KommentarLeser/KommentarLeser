@@ -26,14 +26,17 @@ namespace KommentarLeser
 		private string _version = "";
 		private AngleSharp.Dom.Html.IHtmlDocument doc;
 		private AngleSharp.Dom.IElement commentList;
-		private System.Collections.Generic.SortedDictionary<string, System.Collections.Generic.List<TreeNode>> _userNames;
+		private System.Collections.Generic.SortedDictionary<string, System.Collections.Generic.List<entry>> _userNames;
+		private System.Collections.Generic.Dictionary<string, entry> _id2entry;
 		private bool expanded = false;
 
-		private List<ListViewItem> entryList = new List<ListViewItem>();
+		private List<entry> entryList = new List<entry>();
 		private SortedSet<string> seenSet = new SortedSet<string>();
 		private SortedSet<string> checkedSet = new SortedSet<string>();
 		private string selectedCommentId = "";
 		private System.Net.WebClient webClient = new System.Net.WebClient();
+
+		private bool _handleEvents = true;
 
 		private Font regularFont;
 		private Font boldFont;
@@ -62,7 +65,8 @@ namespace KommentarLeser
 			FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 			_version = "v" + fileVersionInfo.ProductVersion;
 			Text = "KommentarLeser - " + _version;
-			_userNames = new SortedDictionary<string, List<TreeNode>>();
+			_userNames = new SortedDictionary<string, List<entry>>();
+			_id2entry = new Dictionary<string, entry>();
 			if(Properties.Settings.Default.size.Height != -1)
 			{
 				Location = Properties.Settings.Default.location;
@@ -97,11 +101,11 @@ namespace KommentarLeser
 					string html = Encoding.UTF8.GetString(bytes);
 					var doc = parser.Parse(html);
 					var list = doc.QuerySelectorAll("h1.entry-title");
-					foreach(var entry in list)
+					foreach(var h1entry in list)
 					{
 						Form1.articleEntry ent = new Form1.articleEntry();
-						ent.name = entry.TextContent;
-						ent.setUrl(entry.QuerySelector("a").GetAttribute("href"));
+						ent.name = h1entry.TextContent;
+						ent.setUrl(h1entry.QuerySelector("a").GetAttribute("href"));
 						comboBoxArticles.Items.Add(ent);
 					}
 					num = (i + 2).ToString();
@@ -157,13 +161,15 @@ namespace KommentarLeser
 			public string link;
 			public string text;
 			public bool seen = false;
+			public TreeNode tn;
+			public ListViewItem lvi;
 			public override string ToString()
 			{
 				return name + "  -  " + when;
 			}
-			public static int Compare(ListViewItem a, ListViewItem b)
+			public static int Compare(entry a, entry b)
 			{
-				int res = ((entry)a.Tag).timestamp.CompareTo(((entry)b.Tag).timestamp);
+				int res = a.timestamp.CompareTo(b.timestamp);
 				return res;
 			}
 		}
@@ -293,6 +299,7 @@ namespace KommentarLeser
 					treeView1.Nodes.Clear();
 					listView1.Items.Clear();
 					entryList.Clear();
+					_id2entry.Clear();
 				}
 				_userNames.Clear();
 				comboBoxNutzer.Items.Clear();
@@ -335,7 +342,7 @@ namespace KommentarLeser
 				treeView1.Nodes.Clear();
 				listView1.Items.Clear();
 				entryList.Clear();
-
+				_id2entry.Clear();
 				_userNames.Clear();
 				comboBoxNutzer.Items.Clear();
 				comboBoxNutzer.SelectedIndex = -1;
@@ -348,12 +355,14 @@ namespace KommentarLeser
 					loadSeenSet(); // Liste der bereits gesehenen IDs laden
 					loadCheckedSet(); // Liste der mrkierten IDs laden
 
-					_userNames.Add("-- kein --", new List<TreeNode>());
+					_userNames.Add("-- kein --", new List<entry>());
 					treeView1.BeginUpdate();
 					listView1.BeginUpdate();
 					filltree(commentList, treeView1.Nodes[0].Nodes);
 					entryList.Sort(entry.Compare);
-					listView1.Items.AddRange(entryList.ToArray());
+					foreach(var entry in entryList)
+						listView1.Items.Add(entry.lvi);
+					//listView1.Items.AddRange(entryList.ToArray());
 					treeView1.EndUpdate();
 					listView1.EndUpdate();
 					comboBoxNutzer.Items.Clear();
@@ -401,25 +410,22 @@ namespace KommentarLeser
 			foreach(var item in items)
 			{
 				entry ent = new entry();
-				//ent.name = item.QuerySelector("cite.fn").TextContent;
 				var fn = item.QuerySelector(".fn");
 				if(fn == null)
 					continue;
 				ent.name = fn.TextContent;
-				//ent.id = item.QuerySelector(".social-comment-inner").Id;
 				ent.id = item.QuerySelector(".comment-body").Id;//.Trim();
-				//ent.when = item.QuerySelector(".social-posted-when").TextContent;
 				ent.when = item.QuerySelector(".comment-metadata time").TextContent.Trim();
-				//ent.link = item.QuerySelector(".social-posted-when").GetAttribute("href");
 				ent.timestamp = item.QuerySelector(".comment-metadata time").GetAttribute("datetime");
 				ent.link = item.QuerySelector(".comment-metadata a").GetAttribute("href");
-				//ent.text = item.QuerySelector(".social-comment-body").TextContent;
 				ent.text = item.QuerySelector(".comment-content").TextContent;
 				ent.text = ent.text.Trim().Replace("\n", "\r\n\r\n");
-				TreeNode tn = new TreeNode(ent.name + "  -  " + ent.when);
+
+				string eintrag = ent.name + "  -  " + ent.when;
+				TreeNode tn = new TreeNode(eintrag);
 				tn.Tag = ent;
 				tn.Name = ent.id;
-				ListViewItem lvi = new ListViewItem(tn.ToString());
+				ListViewItem lvi = new ListViewItem(eintrag);
 				lvi.Tag = ent;
 				lvi.Name = ent.id;
 				if(seenSet.Contains(ent.id))
@@ -429,12 +435,14 @@ namespace KommentarLeser
 					tn.Checked = true;
 					lvi.Checked = true;
 				}
-
+				ent.tn = tn;
+				ent.lvi = lvi;
 				nodelist.Add(tn);
-				entryList.Add(lvi);
+				entryList.Add(ent);
+				_id2entry.Add(ent.id, ent); // TODO: muß ich hier auf Duplikate achten? Eigentlich sollte das nicht vorkommen.
 				if(!_userNames.ContainsKey(ent.name))
-					_userNames.Add(ent.name, new System.Collections.Generic.List<TreeNode>());
-				_userNames[ent.name].Add(tn);
+					_userNames.Add(ent.name, new System.Collections.Generic.List<entry>());
+				_userNames[ent.name].Add((entry)tn.Tag);
 				var sublist = item.QuerySelector("ol"); // Unterliste?
 				if(sublist != null)
 					filltree(sublist, tn.Nodes);
@@ -503,26 +511,57 @@ namespace KommentarLeser
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
-			treeView1.SelectedNode.NodeFont = regularFont;
+			var node = treeView1.SelectedNode;
+			node.NodeFont = regularFont;
 			treeUpdateText();
-			selectedCommentId = ((entry)treeView1.SelectedNode.Tag).id;
+			selectedCommentId = ((entry)node.Tag).id;
 			Properties.Settings.Default.lastComment = selectedCommentId;
 			Properties.Settings.Default.Save();
-			int count = -1;
-			foreach(ListViewItem vi in listView1.Items)
-			{
-				++count;
-				if(vi.Name == selectedCommentId)
-					break;
-			}
-			if(count < listView1.Items.Count)
-			{
-				//listView1.Select();
-				listView1.Items[count].EnsureVisible();// = true;
-				listView1.Items[count].Selected = true;
-			}
+			var ent = (entry)node.Tag;
+			if(ent.lvi == null)
+				return;
+			ent.lvi.EnsureVisible();
+			ent.lvi.Selected = true;
+//			int count = -1;
+// 			foreach(ListViewItem vi in listView1.Items)
+// 			{
+// 				++count;
+// 				if(vi.Name == selectedCommentId)
+// 					break;
+// 			}
+// 			if(count < listView1.Items.Count)
+// 			{
+// 				//listView1.Select();
+// 				listView1.Items[count].EnsureVisible();// = true;
+// 				listView1.Items[count].Selected = true;
+// 			}
 		}
-
+		private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if(listView1.SelectedItems.Count == 0)
+				return;
+			var lvi = listView1.SelectedItems[0];
+			lvi.Font = regularFont;
+			listUpdateText();
+			selectedCommentId = ((entry)lvi.Tag).id;
+			Properties.Settings.Default.lastComment = selectedCommentId;
+			Properties.Settings.Default.Save();
+			treeView1.SelectedNode = ((entry)lvi.Tag).tn;
+			
+			// 			int count = -1;
+			// 			foreach(ListViewItem vi in listView1.Items)
+			// 			{
+			// 				++count;
+			// 				if(vi.Name == selectedCommentId)
+			// 					break;
+			// 			}
+			// 			if(count < listView1.Items.Count)
+			// 			{
+			// 				//listView1.Select();
+			// 				listView1.Items[count].EnsureVisible();// = true;
+			// 				listView1.Items[count].Selected = true;
+			// 			}
+		}
 		private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
 		{
 			var node = treeView1.SelectedNode;
@@ -648,21 +687,25 @@ namespace KommentarLeser
 		{
 			richTextBox1.Select();
 		}
-
 		private void treeView1_MouseEnter(object sender, EventArgs e)
 		{
 			treeView1.Select();
 		}
+		private void listView1_MouseEnter(object sender, EventArgs e)
+		{
+			listView1.Select();
+		}
+		private void loadButton_MouseEnter(object sender, EventArgs e)
+		{
+			loadButton.Select();
+		}
+
 
 		private void comboBoxArticles_MouseDown(object sender, MouseEventArgs e)
 		{
 			comboBoxArticles.DroppedDown = true;
 		}
 
-		private void loadButton_MouseEnter(object sender, EventArgs e)
-		{
-			loadButton.Select();
-		}
 
 		private void loadButton_MouseLeave(object sender, EventArgs e)
 		{
@@ -673,10 +716,30 @@ namespace KommentarLeser
 
 		private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
 		{
+			if(!_handleEvents)
+				return;
+			entry ent = (entry)e.Node.Tag;
 			if(e.Node.Checked)
-				checkedSet.Add(((entry)e.Node.Tag).id);
+				checkedSet.Add(ent.id);
 			else
-				checkedSet.Remove(((entry)e.Node.Tag).id);
+				checkedSet.Remove(ent.id);
+			_handleEvents = false;
+			ent.lvi.Checked = e.Node.Checked;
+			_handleEvents = true;
+		}
+		private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
+		{
+			if(!_handleEvents)
+				return;
+			entry ent = (entry)e.Item.Tag;
+			if(e.Item.Checked)
+				checkedSet.Add(ent.id);
+			else
+				checkedSet.Remove(ent.id);
+			_handleEvents = false;
+			ent.tn.Checked = e.Item.Checked;
+			_handleEvents = true;
+
 		}
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -687,20 +750,27 @@ namespace KommentarLeser
 				loadButton_Click(null, null);
 			}
 		}
-		System.Collections.Generic.List<TreeNode> _lastSelectedUserList = new System.Collections.Generic.List<TreeNode>();
+		System.Collections.Generic.List<entry> _lastSelectedUserList = new System.Collections.Generic.List<entry>();
+		
 		private void comboBoxNutzer_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			foreach(TreeNode node in _lastSelectedUserList)
+			foreach(entry ent in _lastSelectedUserList)
 			{
-				node.BackColor = treeView1.BackColor;
-				node.NodeFont = regularFont;
+				ent.tn.BackColor = treeView1.BackColor;
+				ent.tn.NodeFont = regularFont;
+				ent.lvi.BackColor = listView1.BackColor;
+				ent.lvi.Font = regularFont;
 			}
 			_lastSelectedUserList = _userNames[(string)comboBoxNutzer.SelectedItem];
-			foreach(TreeNode node in _lastSelectedUserList)
+			foreach(entry ent in _lastSelectedUserList)
 			{
-				node.BackColor = Color.PeachPuff;
-				if(!((entry)node.Tag).seen)
-					node.NodeFont = underlineFont;
+				ent.tn.BackColor = Color.PeachPuff;
+				ent.lvi.BackColor = Color.PeachPuff;
+				if(!ent.seen)
+				{
+					ent.tn.NodeFont = underlineFont;
+					ent.lvi.Font = underlineFont;
+				}
 			}
 		}
 
@@ -760,9 +830,14 @@ namespace KommentarLeser
 			}
 		}
 
-		private void listView1_MouseEnter(object sender, EventArgs e)
+		private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-			listView1.Select();
+			var lvi = listView1.SelectedItems[0];
+			if(lvi != null)
+			{
+				lvi.Checked = !lvi.Checked;
+				System.Diagnostics.Process.Start(((entry)(lvi.Tag)).link);
+			}
 		}
 	}
 
