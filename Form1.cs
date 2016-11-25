@@ -169,7 +169,7 @@ namespace KommentarLeser
 			}
 			public static int Compare(entry a, entry b)
 			{
-				int res = a.timestamp.CompareTo(b.timestamp);
+				int res = b.timestamp.CompareTo(a.timestamp);
 				return res;
 			}
 		}
@@ -360,8 +360,18 @@ namespace KommentarLeser
 					listView1.BeginUpdate();
 					filltree(commentList, treeView1.Nodes[0].Nodes);
 					entryList.Sort(entry.Compare);
+					var g = this.CreateGraphics();
+					g.PageUnit = GraphicsUnit.Pixel;
+					SizeF size = new SizeF(0, 0);
 					foreach(var entry in entryList)
+					{
 						listView1.Items.Add(entry.lvi);
+						//string deb = entry.lvi.Text;
+						float width = g.MeasureString(entry.lvi.Text, entry.lvi.Font).Width;
+						if(size.Width < width)
+							size.Width = width;
+					}
+					listView1.Columns[0].Width = (int)size.Width;
 					//listView1.Items.AddRange(entryList.ToArray());
 					treeView1.EndUpdate();
 					listView1.EndUpdate();
@@ -814,7 +824,7 @@ namespace KommentarLeser
 				if(lowercase.Contains(suchtext))
 				{
 					node.NodeFont = boldFont;
-					node.Text = node.Text;
+					//node.Text = node.Text;
 				}
 				else
 					node.NodeFont = regularFont;
