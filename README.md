@@ -3,6 +3,7 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+- **v1.0.0.20** - Programm hat sich gelesene Beiträge nicht mehr gemerkt.  
 - **v1.0.0.19** - Liste neuester Beiträge. Größe kann verändert werden.  
 - **v1.0.0.18** - Splitter für Baum und Text, d.h. der Trenner zwischen Baum und Text kann verschoben werden.  
 Riesige ToolTips, die durch jede menge Tabs in manchen Einträgen - keine Ahnung, wieso WordPress die da reintut - verursacht wurden, gerichtet.  

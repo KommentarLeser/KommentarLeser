@@ -497,6 +497,7 @@ namespace KommentarLeser
 				ent.lvi.ForeColor = Color.Black;
 			}
 			setFont(ent);
+			seenSet.Add(ent.id);
 		}
 		void markEntryAsInSearch(entry ent, bool mark)
 		{
