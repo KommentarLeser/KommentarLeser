@@ -3,9 +3,10 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+- **v1.0.0.19** - Liste neuester Beiträge. Größe kann verändert werden.  
 - **v1.0.0.18** - Splitter für Baum und Text, d.h. der Trenner zwischen Baum und Text kann verschoben werden.  
 Riesige ToolTips, die durch jede menge Tabs in manchen Einträgen - keine Ahnung, wieso WordPress die da reintut - verursacht wurden, gerichtet.  
-Fehler in Nutzerliste bei Artikelwechsel behoben.
+Fehler in Nutzerliste bei Artikelwechsel behoben.    
 - **v1.0.0.17** - Fehlerkorrektur Absturz.  
 - **v1.0.0.16** - Läuft auf neuer Saker-Seite, verbesserte Nutzersuche, Korrektur Nutzerliste.  
 - **v1.0.0.15** - Fensterposition wird gespeichert/wiederhergestellt.  
@@ -23,5 +24,5 @@ Fehler in Nutzerliste bei Artikelwechsel behoben.
 
 ---
 
-![](http://www2.pic-upload.de/img/31957477/Screen-1.0.0.16.png)
+![](http://www2.pic-upload.de/img/32181318/KLeser19.png)
 
