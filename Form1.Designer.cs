@@ -39,18 +39,18 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.textBoxSuche = new System.Windows.Forms.TextBox();
 			this.buttonSuche = new System.Windows.Forms.Button();
-			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+			this.mainSplitContainer = new System.Windows.Forms.SplitContainer();
+			this.treeSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.listView1 = new System.Windows.Forms.ListView();
 			this.column1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-			this.splitContainer1.Panel1.SuspendLayout();
-			this.splitContainer1.Panel2.SuspendLayout();
-			this.splitContainer1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-			this.splitContainer2.Panel1.SuspendLayout();
-			this.splitContainer2.Panel2.SuspendLayout();
-			this.splitContainer2.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.mainSplitContainer)).BeginInit();
+			this.mainSplitContainer.Panel1.SuspendLayout();
+			this.mainSplitContainer.Panel2.SuspendLayout();
+			this.mainSplitContainer.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.treeSplitContainer)).BeginInit();
+			this.treeSplitContainer.Panel1.SuspendLayout();
+			this.treeSplitContainer.Panel2.SuspendLayout();
+			this.treeSplitContainer.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// treeView1
@@ -60,7 +60,7 @@
 			this.treeView1.HideSelection = false;
 			this.treeView1.Location = new System.Drawing.Point(0, 0);
 			this.treeView1.Name = "treeView1";
-			this.treeView1.Size = new System.Drawing.Size(449, 423);
+			this.treeView1.Size = new System.Drawing.Size(444, 498);
 			this.treeView1.TabIndex = 2;
 			this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -110,7 +110,7 @@
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.richTextBox1.Size = new System.Drawing.Size(645, 655);
+			this.richTextBox1.Size = new System.Drawing.Size(650, 655);
 			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -182,44 +182,45 @@
 			this.buttonSuche.UseVisualStyleBackColor = true;
 			this.buttonSuche.Click += new System.EventHandler(this.buttonSuche_Click);
 			// 
-			// splitContainer1
+			// mainSplitContainer
 			// 
-			this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.mainSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.splitContainer1.Location = new System.Drawing.Point(9, 70);
-			this.splitContainer1.Name = "splitContainer1";
+			this.mainSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+			this.mainSplitContainer.Location = new System.Drawing.Point(9, 70);
+			this.mainSplitContainer.Name = "mainSplitContainer";
 			// 
-			// splitContainer1.Panel1
+			// mainSplitContainer.Panel1
 			// 
-			this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+			this.mainSplitContainer.Panel1.Controls.Add(this.treeSplitContainer);
 			// 
-			// splitContainer1.Panel2
+			// mainSplitContainer.Panel2
 			// 
-			this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
-			this.splitContainer1.Size = new System.Drawing.Size(1098, 655);
-			this.splitContainer1.SplitterDistance = 449;
-			this.splitContainer1.TabIndex = 13;
+			this.mainSplitContainer.Panel2.Controls.Add(this.richTextBox1);
+			this.mainSplitContainer.Size = new System.Drawing.Size(1098, 655);
+			this.mainSplitContainer.SplitterDistance = 444;
+			this.mainSplitContainer.TabIndex = 13;
 			// 
-			// splitContainer2
+			// treeSplitContainer
 			// 
-			this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-			this.splitContainer2.Name = "splitContainer2";
-			this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
+			this.treeSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.treeSplitContainer.Location = new System.Drawing.Point(0, 0);
+			this.treeSplitContainer.Name = "treeSplitContainer";
+			this.treeSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
 			// 
-			// splitContainer2.Panel1
+			// treeSplitContainer.Panel1
 			// 
-			this.splitContainer2.Panel1.Controls.Add(this.treeView1);
-			this.splitContainer2.Panel1MinSize = 0;
+			this.treeSplitContainer.Panel1.Controls.Add(this.treeView1);
+			this.treeSplitContainer.Panel1MinSize = 0;
 			// 
-			// splitContainer2.Panel2
+			// treeSplitContainer.Panel2
 			// 
-			this.splitContainer2.Panel2.Controls.Add(this.listView1);
-			this.splitContainer2.Panel2MinSize = 0;
-			this.splitContainer2.Size = new System.Drawing.Size(449, 655);
-			this.splitContainer2.SplitterDistance = 423;
-			this.splitContainer2.TabIndex = 6;
+			this.treeSplitContainer.Panel2.Controls.Add(this.listView1);
+			this.treeSplitContainer.Panel2MinSize = 0;
+			this.treeSplitContainer.Size = new System.Drawing.Size(444, 655);
+			this.treeSplitContainer.SplitterDistance = 498;
+			this.treeSplitContainer.TabIndex = 6;
 			// 
 			// listView1
 			// 
@@ -232,7 +233,7 @@
 			this.listView1.Location = new System.Drawing.Point(0, 0);
 			this.listView1.MultiSelect = false;
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(449, 228);
+			this.listView1.Size = new System.Drawing.Size(444, 153);
 			this.listView1.TabIndex = 5;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -251,7 +252,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1119, 737);
-			this.Controls.Add(this.splitContainer1);
+			this.Controls.Add(this.mainSplitContainer);
 			this.Controls.Add(this.buttonSuche);
 			this.Controls.Add(this.textBoxSuche);
 			this.Controls.Add(this.label2);
@@ -268,14 +269,14 @@
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.Shown += new System.EventHandler(this.Form1_Shown);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
-			this.splitContainer1.Panel1.ResumeLayout(false);
-			this.splitContainer1.Panel2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-			this.splitContainer1.ResumeLayout(false);
-			this.splitContainer2.Panel1.ResumeLayout(false);
-			this.splitContainer2.Panel2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-			this.splitContainer2.ResumeLayout(false);
+			this.mainSplitContainer.Panel1.ResumeLayout(false);
+			this.mainSplitContainer.Panel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.mainSplitContainer)).EndInit();
+			this.mainSplitContainer.ResumeLayout(false);
+			this.treeSplitContainer.Panel1.ResumeLayout(false);
+			this.treeSplitContainer.Panel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.treeSplitContainer)).EndInit();
+			this.treeSplitContainer.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -294,10 +295,10 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textBoxSuche;
 		private System.Windows.Forms.Button buttonSuche;
-		private System.Windows.Forms.SplitContainer splitContainer1;
+		private System.Windows.Forms.SplitContainer mainSplitContainer;
 		private System.Windows.Forms.ListView listView1;
 		private System.Windows.Forms.ColumnHeader column1;
-		private System.Windows.Forms.SplitContainer splitContainer2;
+		private System.Windows.Forms.SplitContainer treeSplitContainer;
 	}
 }
 

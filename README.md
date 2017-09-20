@@ -3,6 +3,8 @@
 Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 
 ----
+- **v1.0.0.21** - Kommt jetzt auch mit dem selbstsignierten Zertifikat von vineyardsaker.de klar. Das Blog kann jetzt also auch via https gelesen werden.  
+Speicherung/Wiederherstellung der Größen- und Verhälnisparameter verbessert/korrigiert.
 - **v1.0.0.20** - Programm hat sich gelesene Beiträge nicht mehr gemerkt.  
 - **v1.0.0.19** - Liste neuester Beiträge. Größe kann verändert werden.  
 - **v1.0.0.18** - Splitter für Baum und Text, d.h. der Trenner zwischen Baum und Text kann verschoben werden.  

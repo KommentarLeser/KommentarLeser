@@ -18,6 +18,15 @@ namespace KommentarLeser
 {
 	public partial class Form1 : Form
 	{
+		private class MyWebClient : System.Net.WebClient
+		{
+			protected override System.Net.WebRequest GetWebRequest(Uri uri)
+			{
+				System.Net.WebRequest w = base.GetWebRequest(uri);
+				w.Timeout = (120 * 1000);
+				return w;
+			}
+		}
 		private AngleSharp.Parser.Html.HtmlParser parser;
 		private string _url;
 		private string html;
@@ -34,7 +43,8 @@ namespace KommentarLeser
 		private SortedSet<string> seenSet = new SortedSet<string>();
 		private SortedSet<string> checkedSet = new SortedSet<string>();
 		private string selectedCommentId = "";
-		private System.Net.WebClient webClient = new System.Net.WebClient();
+		//private System.Net.WebClient webClient = new System.Net.WebClient();
+		private MyWebClient webClient = new MyWebClient();
 
 		private bool _handleEvents = true;
 
@@ -62,7 +72,13 @@ namespace KommentarLeser
 			progOptionPath += @"\KommentarLeser\";
 			if(!System.IO.Directory.Exists(progOptionPath))
 				System.IO.Directory.CreateDirectory(progOptionPath);
+			initiateSSLTrust();
+			webClient.DownloadDataCompleted += new System.Net.DownloadDataCompletedEventHandler(downloadDataCallback);
+
 		}
+		//public delegate void DownloadDataCompletedEventHandler(Object sender,
+		//														System.Net.DownloadDataCompletedEventArgs e);
+
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
@@ -72,23 +88,54 @@ namespace KommentarLeser
 			Text = "KommentarLeser - " + _version;
 			_userNames = new SortedDictionary<string, List<entry>>();
 			_id2entry = new Dictionary<string, entry>();
-			if(Properties.Settings.Default.size.Height != -1)
-			{
-				Location = Properties.Settings.Default.location;
-				Size = Properties.Settings.Default.size;
-				splitContainer1.SplitterDistance = Properties.Settings.Default.splitterDistance;
-			}
-			if(Properties.Settings.Default.treeSplitterDistance != -1)
-			{
-				splitContainer2.SplitterDistance = Properties.Settings.Default.treeSplitterDistance;
-			}
+			System.Drawing.Point location = Properties.Settings.Default.location;
+			if(location.X < 0)
+				location.X = 0;
+			if(location.Y < 0)
+				location.Y = 0;
+			Location = location;
+
+			System.Drawing.Size size = Properties.Settings.Default.size;
+			if(size.Height < 375)
+				size.Height = 375;
+			if(size.Width < 785)
+				size.Width = 785;
+			Size = size;
+
+			treeSplitContainer.Panel1MinSize = 100;
+			treeSplitContainer.Panel2MinSize = 100;
+			mainSplitContainer.Panel1MinSize = 100;
+			mainSplitContainer.Panel2MinSize = 100;
+			if(Properties.Settings.Default.splitterDistance >= mainSplitContainer.Panel1MinSize
+				&& Properties.Settings.Default.splitterDistance <= mainSplitContainer.Width - mainSplitContainer.Panel2MinSize)
+				mainSplitContainer.SplitterDistance = Properties.Settings.Default.splitterDistance;
 			else
-			{
-				splitContainer2.SplitterDistance = splitContainer2.Height / 3 * 2;
-			}
+				mainSplitContainer.SplitterDistance = mainSplitContainer.Panel1MinSize;
+
+			if(Properties.Settings.Default.treeSplitterDistance >= treeSplitContainer.Panel1MinSize 
+				&& Properties.Settings.Default.treeSplitterDistance <= treeSplitContainer.Height - treeSplitContainer.Panel2MinSize)
+				treeSplitContainer.SplitterDistance = Properties.Settings.Default.treeSplitterDistance;
+			else
+				treeSplitContainer.SplitterDistance = treeSplitContainer.Panel1MinSize;
 			enableAll(false);
 		}
-
+		private void initiateSSLTrust()
+		{
+			try
+			{
+				//Change SSL checks so that all checks pass
+				System.Net.ServicePointManager.ServerCertificateValidationCallback =
+				   new System.Net.Security.RemoteCertificateValidationCallback(
+						delegate {
+							return true;
+						}
+					);
+			}
+			catch(Exception ex)
+			{
+				MessageBox.Show(this, ex.Message);
+			}
+		}
 		private int findInCombobox(string surl)
 		{
 			int ctr = 0;
@@ -100,32 +147,75 @@ namespace KommentarLeser
 			}
 			return -1;
 		}
-
+		private byte[] downloadBytes;
+		private bool downloadOK;
+		private bool downloadDone;
+		void downloadDataCallback(Object Sender, System.Net.DownloadDataCompletedEventArgs e)
+		{
+			if(e.Error != null)
+				downloadOK = false;
+			else
+			{
+				downloadBytes = e.Result;
+				downloadOK = true;
+			}
+			downloadDone = true;
+		}
 		private void readArticleList(Progress p)
 		{
 			string num = "1";
 			try
 			{
-				string mainUrl = "http://vineyardsaker.de";
+				string mainUrl = "https://vineyardsaker.de";
 				for(int i = 0; i < 5; ++i)
 				{
+					Uri mainUri = new Uri(mainUrl);
+					byte[] bytes = new byte[0]; // pro forma, doof
 					p.set(num);
-					byte[] bytes = webClient.DownloadData(mainUrl);
-					string html = Encoding.UTF8.GetString(bytes);
-					var doc = parser.Parse(html);
-					var list = doc.QuerySelectorAll("h1.entry-title");
-					foreach(var h1entry in list)
+					//var prox = webClient.Proxy;
+					//webClient.Proxy = System.Net.
+					webClient.Proxy = System.Net.WebRequest.GetSystemWebProxy();
+					//bytes = webClient.DownloadData(mainUrl);
+					webClient.DownloadDataAsync(mainUri);
+					for(int ii = 0; ii < _loadTimeoutIntervalCount; ++ii)
 					{
-						Form1.articleEntry ent = new Form1.articleEntry();
-						ent.name = h1entry.TextContent;
-						ent.setUrl(h1entry.QuerySelector("a").GetAttribute("href"));
-						comboBoxArticles.Items.Add(ent);
+						Application.DoEvents();
+						if(downloadDone)
+						{
+							downloadDone = false;
+							if(downloadOK)
+							{
+								bytes = downloadBytes;
+								downloadBytes = null;
+							}
+							break;
+						}
+						System.Threading.Thread.Sleep(_loadTimeoutInterval);
 					}
-					num = (i + 2).ToString();
-					mainUrl = "http://vineyardsaker.de/page/" + num;
+					if(!downloadOK)
+					{
+						webClient.CancelAsync();
+						throw new Exception("Webserver hat nach " + (int)(_loadTimeoutIntervalCount * (_loadTimeoutInterval / 1000.0)) + " Sekunden nicht geantwortet.");
+					}
+					else
+					{
+						downloadOK = false;
+						string html = Encoding.UTF8.GetString(bytes);
+						var doc = parser.Parse(html);
+						var list = doc.QuerySelectorAll("h1.entry-title");
+						foreach(var h1entry in list)
+						{
+							Form1.articleEntry ent = new Form1.articleEntry();
+							ent.name = h1entry.TextContent;
+							ent.setUrl(h1entry.QuerySelector("a").GetAttribute("href"));
+							comboBoxArticles.Items.Add(ent);
+						}
+						num = (i + 2).ToString();
+						mainUrl = "https://vineyardsaker.de/page/" + num;
 #if DEBUG
-					break; // im DEBUG-Modus nur eine Seite Laden
+						break; // im DEBUG-Modus nur eine Seite Laden
 #endif
+					}
 				}
 			}
 			catch(Exception ex)
@@ -133,7 +223,7 @@ namespace KommentarLeser
 				int nnum;
 				int.TryParse(num, out nnum);
 				if(nnum == 1)
-					MessageBox.Show("Fehler beim Lesen der Artikelliste\n" + ex.ToString());
+					MessageBox.Show(this, "Fehler beim Lesen der Artikelliste\n" + ex.Message);
 			}
 			p.set("");
 		}
@@ -236,7 +326,6 @@ namespace KommentarLeser
 			urlsw.WriteLine(this.textBoxUrl.Text);
 			urlsw.Close();
 			Properties.Settings.Default.expanded = expanded;
-			Properties.Settings.Default.Save();
 		}
 		void updateText(entry ent)
 		{
@@ -331,7 +420,32 @@ namespace KommentarLeser
 				Application.DoEvents();
 
 				setUrl(textBoxUrl.Text);
-				byte[] bytes = webClient.DownloadData(_url);
+
+				byte[] bytes = new byte[0]; // pro forma, doof
+				Uri uri = new Uri(textBoxUrl.Text);
+				//byte[] bytes = webClient.DownloadData(_url);
+				webClient.DownloadDataAsync(uri);
+				for(int ii = 0; ii < _loadTimeoutIntervalCount; ++ii)
+				{
+					Application.DoEvents();
+					if(downloadDone)
+					{
+						downloadDone = false;
+						if(downloadOK)
+						{
+							bytes = downloadBytes;
+							downloadBytes = null;
+							break;
+						}
+					}
+					System.Threading.Thread.Sleep(_loadTimeoutInterval);
+				}
+				if(!downloadOK)
+				{
+					webClient.CancelAsync();
+					throw new Exception("Webserver hat nach " + (int)(_loadTimeoutIntervalCount * (_loadTimeoutInterval / 1000.0)) + " Sekunden		nicht geantwortet.");
+				}
+				downloadOK = false;
 				html = System.Text.Encoding.UTF8.GetString(bytes);
 				doc = parser.Parse(html);
 
@@ -370,7 +484,7 @@ namespace KommentarLeser
 				_userNames.Clear();
 				comboBoxNutzer.Items.Clear();
 				comboBoxNutzer.SelectedIndex = -1;
-				MessageBox.Show("Kein Artikel gefunden.");
+				MessageBox.Show(this, ex.Message);
 			}
 			finally
 			{
@@ -595,12 +709,13 @@ namespace KommentarLeser
 		{
 			Properties.Settings.Default.location = Location;
 			Properties.Settings.Default.size = Size;
-			Properties.Settings.Default.splitterDistance = splitContainer1.SplitterDistance;
-			Properties.Settings.Default.treeSplitterDistance = splitContainer2.SplitterDistance;
+			Properties.Settings.Default.splitterDistance = mainSplitContainer.SplitterDistance;
+			Properties.Settings.Default.treeSplitterDistance = treeSplitContainer.SplitterDistance;
 			if(treeView1.Nodes.Count > 0 && _url != "")
 			{
 				saveState();
 			}
+			Properties.Settings.Default.Save();
 		}
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -819,7 +934,9 @@ namespace KommentarLeser
 			}
 		}
 		System.Collections.Generic.List<entry> _lastSelectedUserList = new System.Collections.Generic.List<entry>();
-		
+		private int _loadTimeoutIntervalCount = 240;
+		private int _loadTimeoutInterval = 250;
+
 		private void comboBoxNutzer_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			foreach(entry ent in _lastSelectedUserList)
