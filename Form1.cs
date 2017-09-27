@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+//using System.ComponentModel;
+//using System.Data;
 using System.Drawing;
-using System.Linq;
+//using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using AngleSharp;
@@ -66,7 +66,7 @@ namespace KommentarLeser
 			parser = new AngleSharp.Parser.Html.HtmlParser();
 #if DEBUG
 			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/die-spaltung-der-linken-ganz-im-sinne-der-herrschenden/";
-			textBoxUrl.Text = @"http://vineyardsaker.de/analyse/der-gescheiterte-putsch-in-der-tuerkei-einige-erste-gedanken/";
+			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/der-gescheiterte-putsch-in-der-tuerkei-einige-erste-gedanken/";
 #endif
 			progOptionPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 			progOptionPath += @"\KommentarLeser\";
@@ -213,7 +213,8 @@ namespace KommentarLeser
 						num = (i + 2).ToString();
 						mainUrl = "https://vineyardsaker.de/page/" + num;
 #if DEBUG
-						break; // im DEBUG-Modus nur eine Seite Laden
+						if(i == 1)
+							break; // im DEBUG-Modus nur zwei Seiten Laden
 #endif
 					}
 				}
@@ -361,14 +362,46 @@ namespace KommentarLeser
 		void loadSeenSet()
 		{
 			string urlFileName = filenameFromUrl(_url);
+			// Seit dem Wechsel zu https wurden die alten gelesen/Einträge nicht mehr geladen,
+			// da sich der Dateiname geändert hat(von http... zu https...).
+			// Daher hier otherFileName, um auch die evtl ander Datei zusätzlich zu laden.
+			// SortedSet hat kein Problem mit nehrfachem Add()
+			string otherUrlFileName;
+			if(urlFileName[4] == 's') // https
+			{
+				otherUrlFileName = "http" + urlFileName.Substring(5, urlFileName.Length - 5);
+			}
+			else // http
+			{
+				otherUrlFileName = "https" + urlFileName.Substring(4, urlFileName.Length - 4);
+			}
 			string loadFile = progOptionPath + urlFileName;
+			string otherLoadFile = progOptionPath + otherUrlFileName;
 			string[] lines;
 			try
 			{
 				lines = System.IO.File.ReadAllLines(loadFile);
 				seenSet.Clear();
-				foreach(string id in lines)
-					seenSet.Add(id);
+				foreach(string id in lines) // TODO: Leerzeilen ignorieren? oder beim Schreiben in saveState()?
+				{
+					var idd = id.Trim();
+					if(!(idd.Length == 0))
+						seenSet.Add(idd);
+				}
+			}
+			catch(Exception)
+			{
+				;
+			}
+			try
+			{
+				lines = System.IO.File.ReadAllLines(otherLoadFile);
+				foreach(string id in lines) // TODO: Leerzeilen ignorieren? oder beim Schreiben in saveState()?
+				{
+					var idd = id.Trim();
+					if(!(idd.Length == 0))
+						seenSet.Add(idd);
+				}
 			}
 			catch(Exception)
 			{
@@ -443,7 +476,7 @@ namespace KommentarLeser
 				if(!downloadOK)
 				{
 					webClient.CancelAsync();
-					throw new Exception("Webserver hat nach " + (int)(_loadTimeoutIntervalCount * (_loadTimeoutInterval / 1000.0)) + " Sekunden		nicht geantwortet.");
+					throw new Exception("Webserver hat nach " + (int)(_loadTimeoutIntervalCount * (_loadTimeoutInterval / 1000.0)) + " Sekunden	nicht geantwortet.");
 				}
 				downloadOK = false;
 				html = System.Text.Encoding.UTF8.GetString(bytes);
