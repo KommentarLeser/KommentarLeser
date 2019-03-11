@@ -33,6 +33,7 @@ namespace KommentarLeser
 		//private string urlFileName = "";
 		private string progOptionPath;
 		private string _version = "";
+		private string _userAgent;
 		private AngleSharp.Dom.Html.IHtmlDocument doc;
 		private AngleSharp.Dom.IElement commentList;
 		private System.Collections.Generic.SortedDictionary<string, System.Collections.Generic.List<entry>> _userNames;
@@ -64,17 +65,12 @@ namespace KommentarLeser
 			underlineBoldFont = new Font(regularFont, FontStyle.Underline | FontStyle.Bold);
 
 			parser = new AngleSharp.Parser.Html.HtmlParser();
-#if DEBUG
-			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/die-spaltung-der-linken-ganz-im-sinne-der-herrschenden/";
-			//textBoxUrl.Text = @"http://vineyardsaker.de/analyse/der-gescheiterte-putsch-in-der-tuerkei-einige-erste-gedanken/";
-#endif
 			progOptionPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 			progOptionPath += @"\KommentarLeser\";
 			if(!System.IO.Directory.Exists(progOptionPath))
 				System.IO.Directory.CreateDirectory(progOptionPath);
 			initiateSSLTrust();
 			webClient.DownloadDataCompleted += new System.Net.DownloadDataCompletedEventHandler(downloadDataCallback);
-
 		}
 		//public delegate void DownloadDataCompletedEventHandler(Object sender,
 		//														System.Net.DownloadDataCompletedEventArgs e);
@@ -85,6 +81,8 @@ namespace KommentarLeser
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 			_version = "v" + fileVersionInfo.ProductVersion;
+			_userAgent = "KommentarLeser " + _version + "\r\n";
+
 			Text = "KommentarLeser - " + _version;
 			_userNames = new SortedDictionary<string, List<entry>>();
 			_id2entry = new Dictionary<string, entry>();
@@ -153,7 +151,10 @@ namespace KommentarLeser
 		void downloadDataCallback(Object Sender, System.Net.DownloadDataCompletedEventArgs e)
 		{
 			if(e.Error != null)
+			{
 				downloadOK = false;
+				MessageBox.Show(e.Error.ToString());
+			}
 			else
 			{
 				downloadBytes = e.Result;
@@ -176,6 +177,7 @@ namespace KommentarLeser
 					//webClient.Proxy = System.Net.
 					webClient.Proxy = System.Net.WebRequest.GetSystemWebProxy();
 					//bytes = webClient.DownloadData(mainUrl);
+					setUserAgent();
 					webClient.DownloadDataAsync(mainUri);
 					for(int ii = 0; ii < _loadTimeoutIntervalCount; ++ii)
 					{
@@ -337,28 +339,7 @@ namespace KommentarLeser
 				markEntryAsSeen(ent, true);
 			}
 		}
-// 		void treeUpdateText()
-// 		{
-// 			TreeNode tn = treeView1.SelectedNode;
-// 			entry ent = (entry)tn?.Tag;
-// 			if(ent != null)
-// 			{
-// 				richTextBox1.Clear();
-// 				richTextBox1.Text = ent.text;
-// 				markEntryAsSeen(ent);
-// 			}
-// 		}
-// 		void listUpdateText()
-// 		{
-// 			ListViewItem lvi = listView1.SelectedItems[0];// .SelectedItem;
-// 			entry ent = (entry)lvi?.Tag;
-// 			if(ent != null)
-// 			{
-// 				richTextBox1.Clear();
-// 				richTextBox1.Text = ent.text;
-// 				markEntryAsSeen(ent);
-// 			}
-// 		}
+
 		void loadSeenSet()
 		{
 			string urlFileName = filenameFromUrl(_url);
@@ -455,8 +436,10 @@ namespace KommentarLeser
 				setUrl(textBoxUrl.Text);
 
 				byte[] bytes = new byte[0]; // pro forma, doof
+
 				Uri uri = new Uri(textBoxUrl.Text);
-				//byte[] bytes = webClient.DownloadData(_url);
+
+				setUserAgent();
 				webClient.DownloadDataAsync(uri);
 				for(int ii = 0; ii < _loadTimeoutIntervalCount; ++ii)
 				{
@@ -476,7 +459,7 @@ namespace KommentarLeser
 				if(!downloadOK)
 				{
 					webClient.CancelAsync();
-					throw new Exception("Webserver hat nach " + (int)(_loadTimeoutIntervalCount * (_loadTimeoutInterval / 1000.0)) + " Sekunden	nicht geantwortet.");
+					throw new Exception("Webserver hat nach " + (int)(_loadTimeoutIntervalCount * (_loadTimeoutInterval / 1000.0)) + " Sekunden nicht geantwortet.");
 				}
 				downloadOK = false;
 				html = System.Text.Encoding.UTF8.GetString(bytes);
@@ -1057,7 +1040,14 @@ namespace KommentarLeser
 				System.Diagnostics.Process.Start(((entry)(lvi.Tag)).link);
 			}
 		}
-	}
+
+		private void setUserAgent()
+		{
+			var headers = webClient.Headers;
+			headers.Add("User-Agent", _userAgent);
+			webClient.Headers = headers;
+		}
+	} // class Form1
 
 	//##############################################################################################
 	//##############################################################################################
