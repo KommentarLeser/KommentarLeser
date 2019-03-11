@@ -2,7 +2,9 @@
 Übersichtlichere Darstellung der Kommentare auf den deutschen Saker-Seiten.  
 Verwendet [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 ----
-![](https://www2.pic-upload.de/img/36380700/Screenshot.png)
+<p align="center">
+  <img width="800" src="https://www2.pic-upload.de/img/36380719/Screenshot.png">
+</p>
 ----
 - **v1.0.0.23** - Nach dem Update von vineyardsaker.de im März 2019 verlangte der Server TLS1.2, was mit .net v4.5.2 nicht funktionierte. -> Umstellung auf .net v4.6.2.
 - **v1.0.0.22** - Intern. 
