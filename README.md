@@ -1,8 +1,11 @@
 # KommentarLeser
 Übersichtlichere Darstellung der Kommentare auf den deutschen Saker-Seiten.  
-Benötigt [AngleSharp](https://github.com/AngleSharp/AngleSharp).
-
+Verwendet [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 ----
+![](https://www2.pic-upload.de/img/36380700/Screenshot.png)
+----
+- **v1.0.0.23** - Nach dem Update von vineyardsaker.de im März 2019 verlangte der Server TLS1.2, was mit .net v4.5.2 nicht funktionierte. -> Umstellung auf .net v4.6.2.
+- **v1.0.0.22** - Intern. 
 - **v1.0.0.21** - Kommt jetzt auch mit dem selbstsignierten Zertifikat von vineyardsaker.de klar. Das Blog kann jetzt also auch via https gelesen werden.  
 Speicherung/Wiederherstellung der Größen- und Verhälnisparameter verbessert/korrigiert.
 - **v1.0.0.20** - Programm hat sich gelesene Beiträge nicht mehr gemerkt.  
@@ -27,5 +30,5 @@ Fehler in Nutzerliste bei Artikelwechsel behoben.
 
 ---
 
-![](http://www2.pic-upload.de/img/32181318/KLeser19.png)
+
 
