@@ -8,6 +8,7 @@ Verwendet [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 </p>
 
 ----
+- **v1.0.0.24** - Läuft nun auch mit .net 4.5.2. Soll auch mit .net 4.0 laufen(ungetestet).
 - **v1.0.0.23** - Nach dem Update von vineyardsaker.de im März 2019 verlangte der Server TLS1.2, was mit .net v4.5.2 nicht funktionierte. -> Umstellung auf .net v4.6.2.
 - **v1.0.0.22** - Intern. 
 - **v1.0.0.21** - Kommt jetzt auch mit dem selbstsignierten Zertifikat von vineyardsaker.de klar. Das Blog kann jetzt also auch via https gelesen werden.  
