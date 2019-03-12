@@ -71,6 +71,10 @@ namespace KommentarLeser
 				System.IO.Directory.CreateDirectory(progOptionPath);
 			initiateSSLTrust();
 			webClient.DownloadDataCompleted += new System.Net.DownloadDataCompletedEventHandler(downloadDataCallback);
+
+			//System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+			System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; // fuer .net 4.0
+
 		}
 		//public delegate void DownloadDataCompletedEventHandler(Object sender,
 		//														System.Net.DownloadDataCompletedEventArgs e);
@@ -87,6 +91,7 @@ namespace KommentarLeser
 			_userNames = new SortedDictionary<string, List<entry>>();
 			_id2entry = new Dictionary<string, entry>();
 			System.Drawing.Point location = Properties.Settings.Default.location;
+
 			if(location.X < 0)
 				location.X = 0;
 			if(location.Y < 0)
@@ -94,27 +99,47 @@ namespace KommentarLeser
 			Location = location;
 
 			System.Drawing.Size size = Properties.Settings.Default.size;
-			if(size.Height < 375)
-				size.Height = 375;
-			if(size.Width < 785)
-				size.Width = 785;
-			Size = size;
+			if(size.Height < 0 | size.Width < 0)
+			{
+				;// nichts(standard)
+			}
+			else
+			{
+				if(size.Height < 375)
+					size.Height = 375;
+				if(size.Width < 785)
+					size.Width = 785;
+				Size = size;
+			}
 
 			treeSplitContainer.Panel1MinSize = 100;
 			treeSplitContainer.Panel2MinSize = 100;
 			mainSplitContainer.Panel1MinSize = 100;
 			mainSplitContainer.Panel2MinSize = 100;
-			if(Properties.Settings.Default.splitterDistance >= mainSplitContainer.Panel1MinSize
-				&& Properties.Settings.Default.splitterDistance <= mainSplitContainer.Width - mainSplitContainer.Panel2MinSize)
-				mainSplitContainer.SplitterDistance = Properties.Settings.Default.splitterDistance;
+			if(Properties.Settings.Default.splitterDistance < 0)
+			{
+				;// nichts(standard)
+			}
 			else
-				mainSplitContainer.SplitterDistance = mainSplitContainer.Panel1MinSize;
-
-			if(Properties.Settings.Default.treeSplitterDistance >= treeSplitContainer.Panel1MinSize 
-				&& Properties.Settings.Default.treeSplitterDistance <= treeSplitContainer.Height - treeSplitContainer.Panel2MinSize)
-				treeSplitContainer.SplitterDistance = Properties.Settings.Default.treeSplitterDistance;
+			{
+				if(Properties.Settings.Default.splitterDistance >= mainSplitContainer.Panel1MinSize
+								&& Properties.Settings.Default.splitterDistance <= mainSplitContainer.Width - mainSplitContainer.Panel2MinSize)
+					mainSplitContainer.SplitterDistance = Properties.Settings.Default.splitterDistance;
+				else
+					mainSplitContainer.SplitterDistance = mainSplitContainer.Panel1MinSize;
+			}
+			if(Properties.Settings.Default.treeSplitterDistance < 0)
+			{
+				;// nichts(standard)
+			}
 			else
-				treeSplitContainer.SplitterDistance = treeSplitContainer.Panel1MinSize;
+			{
+				if(Properties.Settings.Default.treeSplitterDistance >= treeSplitContainer.Panel1MinSize
+								&& Properties.Settings.Default.treeSplitterDistance <= treeSplitContainer.Height - treeSplitContainer.Panel2MinSize)
+					treeSplitContainer.SplitterDistance = Properties.Settings.Default.treeSplitterDistance;
+				else
+					treeSplitContainer.SplitterDistance = treeSplitContainer.Panel1MinSize;
+			}
 			enableAll(false);
 		}
 		private void initiateSSLTrust()

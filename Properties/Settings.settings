@@ -12,13 +12,13 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="location" Type="System.Drawing.Point" Scope="User">
-      <Value Profile="(Default)">10, 10</Value>
+      <Value Profile="(Default)">-1, -1</Value>
     </Setting>
     <Setting Name="size" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">-1, -1</Value>
     </Setting>
     <Setting Name="splitterDistance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">449</Value>
+      <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="treeSplitterDistance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>

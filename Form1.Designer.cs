@@ -60,7 +60,7 @@
 			this.treeView1.HideSelection = false;
 			this.treeView1.Location = new System.Drawing.Point(0, 0);
 			this.treeView1.Name = "treeView1";
-			this.treeView1.Size = new System.Drawing.Size(444, 498);
+			this.treeView1.Size = new System.Drawing.Size(390, 448);
 			this.treeView1.TabIndex = 2;
 			this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -96,7 +96,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBoxUrl.Location = new System.Drawing.Point(166, 15);
 			this.textBoxUrl.Name = "textBoxUrl";
-			this.textBoxUrl.Size = new System.Drawing.Size(866, 20);
+			this.textBoxUrl.Size = new System.Drawing.Size(763, 20);
 			this.textBoxUrl.TabIndex = 5;
 			this.textBoxUrl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxUrl_KeyPress);
 			// 
@@ -110,7 +110,7 @@
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.richTextBox1.Size = new System.Drawing.Size(650, 655);
+			this.richTextBox1.Size = new System.Drawing.Size(601, 639);
 			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -132,7 +132,7 @@
 			this.comboBoxArticles.FormattingEnabled = true;
 			this.comboBoxArticles.Location = new System.Drawing.Point(166, 41);
 			this.comboBoxArticles.Name = "comboBoxArticles";
-			this.comboBoxArticles.Size = new System.Drawing.Size(466, 21);
+			this.comboBoxArticles.Size = new System.Drawing.Size(363, 21);
 			this.comboBoxArticles.TabIndex = 8;
 			this.comboBoxArticles.SelectedIndexChanged += new System.EventHandler(this.comboBoxArticles_SelectedIndexChanged);
 			this.comboBoxArticles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.comboBoxArticles_MouseDown);
@@ -143,7 +143,7 @@
 			this.comboBoxNutzer.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
 			this.comboBoxNutzer.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
 			this.comboBoxNutzer.FormattingEnabled = true;
-			this.comboBoxNutzer.Location = new System.Drawing.Point(685, 41);
+			this.comboBoxNutzer.Location = new System.Drawing.Point(582, 41);
 			this.comboBoxNutzer.Name = "comboBoxNutzer";
 			this.comboBoxNutzer.Size = new System.Drawing.Size(162, 21);
 			this.comboBoxNutzer.TabIndex = 9;
@@ -155,7 +155,7 @@
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(638, 44);
+			this.label2.Location = new System.Drawing.Point(535, 44);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(41, 13);
 			this.label2.TabIndex = 10;
@@ -164,7 +164,7 @@
 			// textBoxSuche
 			// 
 			this.textBoxSuche.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBoxSuche.Location = new System.Drawing.Point(853, 41);
+			this.textBoxSuche.Location = new System.Drawing.Point(750, 41);
 			this.textBoxSuche.Name = "textBoxSuche";
 			this.textBoxSuche.Size = new System.Drawing.Size(179, 20);
 			this.textBoxSuche.TabIndex = 11;
@@ -173,7 +173,7 @@
 			// buttonSuche
 			// 
 			this.buttonSuche.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonSuche.Location = new System.Drawing.Point(1038, 38);
+			this.buttonSuche.Location = new System.Drawing.Point(935, 38);
 			this.buttonSuche.Name = "buttonSuche";
 			this.buttonSuche.Size = new System.Drawing.Size(71, 23);
 			this.buttonSuche.TabIndex = 12;
@@ -198,8 +198,8 @@
 			// mainSplitContainer.Panel2
 			// 
 			this.mainSplitContainer.Panel2.Controls.Add(this.richTextBox1);
-			this.mainSplitContainer.Size = new System.Drawing.Size(1098, 655);
-			this.mainSplitContainer.SplitterDistance = 444;
+			this.mainSplitContainer.Size = new System.Drawing.Size(995, 639);
+			this.mainSplitContainer.SplitterDistance = 390;
 			this.mainSplitContainer.TabIndex = 13;
 			// 
 			// treeSplitContainer
@@ -218,8 +218,8 @@
 			// 
 			this.treeSplitContainer.Panel2.Controls.Add(this.listView1);
 			this.treeSplitContainer.Panel2MinSize = 0;
-			this.treeSplitContainer.Size = new System.Drawing.Size(444, 655);
-			this.treeSplitContainer.SplitterDistance = 498;
+			this.treeSplitContainer.Size = new System.Drawing.Size(390, 639);
+			this.treeSplitContainer.SplitterDistance = 448;
 			this.treeSplitContainer.TabIndex = 6;
 			// 
 			// listView1
@@ -233,7 +233,7 @@
 			this.listView1.Location = new System.Drawing.Point(0, 0);
 			this.listView1.MultiSelect = false;
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(444, 153);
+			this.listView1.Size = new System.Drawing.Size(390, 187);
 			this.listView1.TabIndex = 5;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -251,7 +251,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1119, 737);
+			this.ClientSize = new System.Drawing.Size(1016, 721);
 			this.Controls.Add(this.mainSplitContainer);
 			this.Controls.Add(this.buttonSuche);
 			this.Controls.Add(this.textBoxSuche);

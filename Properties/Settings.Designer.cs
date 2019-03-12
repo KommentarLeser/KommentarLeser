@@ -61,7 +61,7 @@ namespace KommentarLeser.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10, 10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1, -1")]
         public global::System.Drawing.Point location {
             get {
                 return ((global::System.Drawing.Point)(this["location"]));
@@ -85,7 +85,7 @@ namespace KommentarLeser.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("449")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
         public int splitterDistance {
             get {
                 return ((int)(this["splitterDistance"]));
