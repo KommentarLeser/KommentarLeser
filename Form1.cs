@@ -72,14 +72,12 @@ namespace KommentarLeser
 			initiateSSLTrust();
 			webClient.DownloadDataCompleted += new System.Net.DownloadDataCompletedEventHandler(downloadDataCallback);
 
-			//System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-			System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; // fuer .net 4.0
+			System.Net.ServicePointManager.Expect100Continue = true;
+			System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls11;
+			//System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; // fuer .net 4.0
 
 		}
-		//public delegate void DownloadDataCompletedEventHandler(Object sender,
-		//														System.Net.DownloadDataCompletedEventArgs e);
-
-
+		
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			Assembly assembly = Assembly.GetExecutingAssembly();
