@@ -11,6 +11,7 @@ Verwendet [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 </p>
 
 ----
+- **v1.0.0.26** - Wieder auf TLS 1.2 umstellen.
 - **v1.0.0.25** - Musste nach dem letzten Serverausfall wieder auf TLS 1.1 umgestellt werden.
 - **v1.0.0.24** - Läuft nun auch mit .net 4.5.2. Soll auch mit .net 4.0 laufen(ungetestet).
 - **v1.0.0.23** - Nach dem Update von vineyardsaker.de im März 2019 verlangte der Server TLS 1.2, was mit .net v4.5.2 nicht funktionierte. -> Umstellung auf .net v4.6.2.
