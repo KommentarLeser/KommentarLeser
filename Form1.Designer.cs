@@ -60,7 +60,7 @@
 			this.treeView1.HideSelection = false;
 			this.treeView1.Location = new System.Drawing.Point(0, 0);
 			this.treeView1.Name = "treeView1";
-			this.treeView1.Size = new System.Drawing.Size(390, 448);
+			this.treeView1.Size = new System.Drawing.Size(390, 826);
 			this.treeView1.TabIndex = 2;
 			this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
 			this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -110,7 +110,7 @@
 			this.richTextBox1.Name = "richTextBox1";
 			this.richTextBox1.ReadOnly = true;
 			this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.richTextBox1.Size = new System.Drawing.Size(601, 639);
+			this.richTextBox1.Size = new System.Drawing.Size(601, 1179);
 			this.richTextBox1.TabIndex = 3;
 			this.richTextBox1.Text = "";
 			this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -198,7 +198,7 @@
 			// mainSplitContainer.Panel2
 			// 
 			this.mainSplitContainer.Panel2.Controls.Add(this.richTextBox1);
-			this.mainSplitContainer.Size = new System.Drawing.Size(995, 639);
+			this.mainSplitContainer.Size = new System.Drawing.Size(995, 1179);
 			this.mainSplitContainer.SplitterDistance = 390;
 			this.mainSplitContainer.TabIndex = 13;
 			// 
@@ -218,8 +218,8 @@
 			// 
 			this.treeSplitContainer.Panel2.Controls.Add(this.listView1);
 			this.treeSplitContainer.Panel2MinSize = 0;
-			this.treeSplitContainer.Size = new System.Drawing.Size(390, 639);
-			this.treeSplitContainer.SplitterDistance = 448;
+			this.treeSplitContainer.Size = new System.Drawing.Size(390, 1179);
+			this.treeSplitContainer.SplitterDistance = 826;
 			this.treeSplitContainer.TabIndex = 6;
 			// 
 			// listView1
@@ -233,7 +233,7 @@
 			this.listView1.Location = new System.Drawing.Point(0, 0);
 			this.listView1.MultiSelect = false;
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(390, 187);
+			this.listView1.Size = new System.Drawing.Size(390, 349);
 			this.listView1.TabIndex = 5;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -251,7 +251,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1016, 721);
+			this.ClientSize = new System.Drawing.Size(1016, 1261);
 			this.Controls.Add(this.mainSplitContainer);
 			this.Controls.Add(this.buttonSuche);
 			this.Controls.Add(this.textBoxSuche);
